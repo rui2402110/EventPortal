@@ -27,6 +27,6 @@ public class HostMenuAction extends Action  {
 		// JSPに送るデータをセット
 		req.setAttribute("event", event);
 		// フォワード
-		req.getRequestDispatcher("host_menu.jsp").forward(req, res);
+		req.getRequestDispatcher("/eventportal/host/host_menu.jsp").forward(req, res);
 	}
 }

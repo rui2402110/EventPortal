@@ -41,7 +41,7 @@ public class HostLoginExecuteAction extends Action {
 			session.setAttribute("user", user);
 
 			//リダイレクト
-			url = "/EventPortal/eventportal/hostmenu/HostMenu.Action";
+			url = req.getContextPath() + "/eventportal/hostmenu/HostMenu.action";
 			res.sendRedirect(url);
 
 		} else {
