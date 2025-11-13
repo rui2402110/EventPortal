@@ -11,8 +11,8 @@
     <div class="header">イベントポータル</div>
 
     <div class="content">
-      <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/LoginPage.action'">① ログインはこちら</button>
-      <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/SigninPage.action'">② サインインはこちら</button>
+      <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/LoginPage.action'">① ログインはこちら</button>
+      <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/SigninPage.action'">② サインインはこちら</button>
     </div>
 
     <div class="footer">@2025.................................................</div>

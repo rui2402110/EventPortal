@@ -1,16 +1,15 @@
-package eventportal;
-
+package eventportal.auth;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import tool.Action;
-public class SigninPageAction extends Action {
+public class AuthPageAction extends Action {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		System.out.println("サインイン選択画面表示");
+		System.out.println("認証選択画面表示");
         // サインイン画面を表示するだけで、特別なロジックは不要
-		req.getRequestDispatcher("/eventportal/auth/auth_08.jsp").forward(req, res);
-        // このパスをFront Controllerが受け取り、auth_08.jspへフォワードする
+		req.getRequestDispatcher("/eventportal/auth/auth_01.jsp").forward(req, res);
+        // auth_01.jspへフォワードする
 
 	}
 }

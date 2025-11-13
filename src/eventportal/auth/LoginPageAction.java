@@ -1,4 +1,4 @@
-package eventportal;
+package eventportal.auth;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

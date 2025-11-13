@@ -15,7 +15,7 @@
             <h2>ログインする区分を選択してください</h2>
 
             <form action="" method="get">
-                <button type="submit" class="btn">参加者としてログイン</button>
+                <button type="submit" class="btn"onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/EntryLogin.action'">参加者としてログイン</button>
             </form>
 
             <form action="" method="get">

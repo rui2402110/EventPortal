@@ -14,7 +14,7 @@
     </div>
 
     <div class="content">
-      <form method="post" action="auth/login.action">
+      <form method="post" action="${pageContext.request.contextPath}/eventportal/auth/EntryLoginExecute.action">
         <input type="hidden" name="role" value="participant">
 
         <div class="form-group">
