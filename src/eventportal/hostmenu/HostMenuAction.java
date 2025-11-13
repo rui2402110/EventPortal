@@ -1,4 +1,4 @@
-package eventportal.auth;
+package eventportal.hostmenu;
 
 import java.util.List;
 

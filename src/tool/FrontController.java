@@ -26,6 +26,7 @@ public class FrontController extends HttpServlet {
 			String path = req.getServletPath().substring(1);
 			// ファイル名を取得しクラス名に変換
 			String name = path.replace(".a", "A").replace('/', '.');
+			System.out.println(name);
 			// アクションクラスのインスタンスを返却
 			Action action = (Action) Class.forName(name).getDeclaredConstructor().newInstance();
 

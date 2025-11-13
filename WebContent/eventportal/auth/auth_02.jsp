@@ -19,12 +19,12 @@
 
         <div class="form-group">
           <label for="id_input">ID</label>
-          <input type="text" id="id_input" name="id_input_text" placeholder="IDを入力する">
+          <input type="text" id="id_input" name="id" placeholder="IDを入力する">
         </div>
 
         <div class="form-group">
           <label for="password_input">PASSWORD</label>
-          <input type="password" id="password_input" name="password_input_text" placeholder="パスワードを入力する">
+          <input type="password" id="password_input" name="password" placeholder="パスワードを入力する">
         </div>
 
         <!-- エラー1 -->
