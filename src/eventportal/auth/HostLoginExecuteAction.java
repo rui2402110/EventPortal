@@ -11,7 +11,7 @@ import bean.User;
 import dao.UserDao;
 import tool.Action;
 
-public class EntryLoginExecuteAction extends Action {
+public class HostLoginExecuteAction extends Action {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		//ローカル変数の宣言
@@ -28,8 +28,8 @@ public class EntryLoginExecuteAction extends Action {
 		id = req.getParameter("id");// 参加者ID
 		password = req.getParameter("password");//パスワード
 
-		//userデータを検索し、取得(参加者のみなので引数に1を選択)
-		user = UserDao.login(id, password, 1);
+		//userデータを検索し、取得(主催者のみなので引数に2を選択)
+		user = UserDao.login(id, password, 2);
 
 		if (user != null){
 			System.out.println("認証成功");
@@ -54,11 +54,9 @@ public class EntryLoginExecuteAction extends Action {
 			req.setAttribute("user_id", id);
 
 			//フォワード
-			url = "/eventportal/entry/host_menu.jsp";
+			url = "/eventportal/auth/auth_03.jsp";
 			req.getRequestDispatcher(url).forward(req, res);
 		}
-
-
 	}
 
 }

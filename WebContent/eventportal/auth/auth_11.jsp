@@ -13,15 +13,8 @@
 
         <div class="content">
             <h2>ログインする区分を選択してください</h2>
-
-            <form action="" method="get">
-                <button type="submit" class="btn"onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/EntryLogin.action'">参加者としてログイン</button>
-            </form>
-
-            <form action="" method="get">
-                <button type="submit" class="btn">主催者としてログイン</button>
-            </form>
-
+                <button type="submit" class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/EntryLogin.action'">参加者としてログイン</button>
+                <button type="submit" class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/HostLogin.action'">主催者としてログイン</button>
             <div class="back">
                 <a href="${pageContext.request.contextPath}/eventportal/AuthPage.action">← 戻る</a>
             </div>

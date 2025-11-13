@@ -18,7 +18,7 @@ public class UserDao extends Dao {
 		try {
 			// プリペアードステートメントにSQL文をセット
 			statement = connection.prepareStatement("SELECT * FROM USERS WHERE user_id=? AND user_type=? ");
-			// プリペアードステートメントに教員IDをセット
+			// プリペアードステートメントにユーザーIDをセット
 			statement.setString(1, id);
 			statement.setInt(2, user_type);
 			// SQL文の実行
