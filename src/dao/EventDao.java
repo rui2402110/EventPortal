@@ -12,8 +12,7 @@ public class EventDao extends Dao {
 
 	// ユーザーIDを使用して、ユーザーIDが合致するイベントを全て取得するメソッド
 	public List<Event> userIdFilter(String userId) throws Exception {
-		// Eventクラスを再定義
-		Event event = new Event();
+
 		// コネクションを確立
 		Connection connection = getConnection();
 		// プリペアードステートメント
@@ -29,7 +28,12 @@ public class EventDao extends Dao {
 			statement.setString(1, userId);
 			// SQL文の実行
 			ResultSet resultSet = statement.executeQuery();
-			if (resultSet.next()) {
+			while (resultSet.next()) {
+				System.out.println("リザルトセット回ってます");
+
+				// ループ内でEventクラスを再定義（各行ごとに新しいインスタンスを作成）
+				Event event = new Event();
+
 				// SELECTしたデータをインスタンスにセット
 			    event.setEventId(resultSet.getString("event_id"));
 			    event.setEventName(resultSet.getString("event_name"));
@@ -52,10 +56,6 @@ public class EventDao extends Dao {
 
 			    // 作成したインスタンスをリストに格納
 			    list.add(event);
-			} else {
-				// リザルトセットが存在しない場合
-				// インスタンスにnullをセット
-				event = null;
 			}
 
 		} catch (Exception e) {
@@ -151,10 +151,8 @@ public class EventDao extends Dao {
 
 	}
 
-	// ユーザーIDを使用して、ユーザーIDが合致するイベントを全て取得するメソッド
+	// 状態が開催前のイベントを全て取得するメソッド
 	public List<Event> joinedFilter() throws Exception {
-		// Eventクラスを再定義
-		Event event = new Event();
 		// コネクションを確立
 		Connection connection = getConnection();
 		// プリペアードステートメント
@@ -168,7 +166,9 @@ public class EventDao extends Dao {
 			statement = connection.prepareStatement("SELECT * FROM EVENTS WHERE EVENT_HOLD_STATE =1");
 			// SQL文の実行
 			ResultSet resultSet = statement.executeQuery();
-			if (resultSet.next()) {
+			while (resultSet.next()) {
+				// ループ内でEventクラスを再定義（各行ごとに新しいインスタンスを作成）
+				Event event = new Event();
 				// SELECTしたデータをインスタンスにセット
 			    event.setEventId(resultSet.getString("event_id"));
 			    event.setEventName(resultSet.getString("event_name"));
@@ -191,10 +191,6 @@ public class EventDao extends Dao {
 
 			    // 作成したインスタンスをリストに格納
 			    list.add(event);
-			} else {
-				// リザルトセットが存在しない場合
-				// インスタンスにnullをセット
-				event = null;
 			}
 
 		} catch (Exception e) {
