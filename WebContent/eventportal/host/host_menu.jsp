@@ -41,7 +41,7 @@
                             <td>${evt.maxCount}</td>
                             <td>${evt.eventHoldState}</td>
                             <td>
-                                <a href="EventDetail.action?id=${evt.eventId}">詳細</a> |
+                                <a href="${pageContext.request.contextPath}/eventportal/hostmenu/HostEventDetail.action?eventId=${evt.eventId}">詳細</a> |
                                 <a href="EventEdit.action?id=${evt.eventId}">編集</a> |
                                 <a href="EventDelete.action?id=${evt.eventId}" onclick="return confirm('本当に削除しますか?')">削除</a>
                             </td>

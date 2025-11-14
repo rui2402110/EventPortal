@@ -1,36 +1,33 @@
 package eventportal.hostmenu;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import bean.Event;
-import bean.User;
 import dao.EventDao;
 import tool.Action;
 
-public class HostMenuAction extends Action  {
+public class HostEventDetailAction extends Action {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		//セッション情報を取得
-		HttpSession session = req.getSession();
-		User user = (User)session.getAttribute("user");
 
+		// jspから送られてきたデータを取得
+		String eventId = req.getParameter("eventId");
+		System.out.println(eventId);
 		// 取得したデータを格納する変数を定義
-		List<Event> event =null;
+		Event event =null;
 
 		// DAOを再定義
 		EventDao evtDao = new EventDao();
 
 		// データを取得
-		event = evtDao.userIdFilter(user.getUser_id());
+		event = evtDao.get(eventId);
 		System.out.println(event);
 
 		// JSPに送るデータをセット
-		req.setAttribute("event", event);
+		req.setAttribute("evt", event);
 		// フォワード
-		req.getRequestDispatcher("/eventportal/host/host_menu.jsp").forward(req, res);
+		req.getRequestDispatcher("/eventportal/host/host_event_detail.jsp").forward(req, res);
 	}
+
 }
