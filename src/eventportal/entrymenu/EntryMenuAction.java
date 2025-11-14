@@ -10,7 +10,7 @@ public class EntryMenuAction extends Action {
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		System.out.println("参加者メニュー画面表示");
         // サインイン画面を表示するだけで、特別なロジックは不要
-		req.getRequestDispatcher("/eventportal/auth/auth_03.jsp").forward(req, res);
+		req.getRequestDispatcher("/eventportal/entry/entry_menu.jsp").forward(req, res);
         // auth_03.jspへフォワードする
 
 	}

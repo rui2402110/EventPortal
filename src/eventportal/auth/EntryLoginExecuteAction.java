@@ -41,7 +41,7 @@ public class EntryLoginExecuteAction extends Action {
 			session.setAttribute("user", user);
 
 			//リダイレクト
-			url = "/eventportal/entrymenu/entry_menu.jsp";
+			url = "/eventportal/entrymenu/EntryMenu.action";
 			res.sendRedirect(url);
 
 		} else {
