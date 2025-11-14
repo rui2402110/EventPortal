@@ -13,7 +13,7 @@
     <div class="content">
       <h2>参加者メニュー</h2>
       <button class="btn" onclick="location.href='eventlist_04.html'">参加者イベント管理</button>
-      <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/EntryEventList.action'">イベント一覧</button>
+      <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/EntryEventList.action'">イベント一覧</button>
     </div>
 
     <div class="footer">@2025................................................</div>
