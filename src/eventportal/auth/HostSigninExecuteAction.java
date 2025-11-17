@@ -11,7 +11,7 @@ import bean.User;
 import dao.UserDao;
 import tool.Action;
 
-public class EntrySigninExecuteAction extends Action {
+public class HostSigninExecuteAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
         //ローカル変数の宣言
@@ -33,8 +33,8 @@ public class EntrySigninExecuteAction extends Action {
         mail_address = req.getParameter("mail_address");
         phone_number = req.getParameter("phone_number");
 
-        // userデータを検索し、取得(参加者のみなので引数に1を選択)
-        user = userDao.signin(id, user_name, mail_address, password, phone_number, 1);
+        // userデータを検索し、取得(主催者のみなので引数に2を選択)
+        user = userDao.signin(id, user_name, mail_address, password, phone_number, 2);
 
         if (user != null){
             System.out.println("認証成功");
@@ -44,7 +44,7 @@ public class EntrySigninExecuteAction extends Action {
             session.setAttribute("user", user);
 
             //リダイレクト
-            url = "../entrymenu/EntryMenu.action";
+            url = "../hostmenu/HostMenu.action";
             res.sendRedirect(url);
 
         } else {
@@ -57,7 +57,7 @@ public class EntrySigninExecuteAction extends Action {
             req.setAttribute("user_id", id);
 
             //フォワード
-            url = "/eventportal/auth/entry_signin.jsp";
+            url = "/eventportal/auth/host_signin.jsp";
             req.getRequestDispatcher(url).forward(req, res);
         }
     }
