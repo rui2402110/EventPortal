@@ -13,8 +13,8 @@
 
     <div class="content">
       <h2>サインインする区分を選択してください</h2>
-      <button class="btn" onclick="location.href='auth_09.html'">参加者サインイン</button>
-      <button class="btn" onclick="location.href='auth_091.html'">主催者サインイン</button>
+                <button type="submit" class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/EntrySignin.action'">参加者としてサインイン</button>
+                <button type="submit" class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/HostLogin.action'">主催者としてサインイン</button>
     </div>
     <div class="back">
       <a href="${pageContext.request.contextPath}/eventportal/AuthPage.action">← 戻る</a>
