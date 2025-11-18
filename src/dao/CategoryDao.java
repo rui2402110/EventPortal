@@ -22,7 +22,6 @@ public class CategoryDao extends Dao {
 			statement = connection.prepareStatement("INSERT INTO CATEGORY(category_id , category_name)VALUES(? , ?)");
 			statement.setString(1 ,catId);
 			statement.setString(2 ,item);
-
 			statement.executeUpdate();
 
 			} catch (Exception e) {
@@ -105,6 +104,41 @@ public class CategoryDao extends Dao {
         return prefix + String.format("%0" + idLen + "d", number);
     }
 
+	// event_categoryにデータを追加するメソッド
+	public void eventCategoryAdd(String eventId , String categoryId){
+		// コネクションを確立
+		Connection connection = getConnection();
+		// プリペアードステートメント
+		PreparedStatement statement = null;
+		try {
+			statement = connection.prepareStatement("INSERT INTO EVENT_CATEGORY(category_id , event_id)VALUES(? , ?)");
+			statement.setString(1 ,categoryId);
+			statement.setString(2 ,eventId);
+			statement.executeUpdate();
 
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			// プリペアードステートメントを閉じる
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+			// コネクションを閉じる
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+		}
+	}
 }
+
+
+
 
