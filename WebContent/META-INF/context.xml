@@ -12,4 +12,7 @@
 		username="sa"
 		password=""
 	/>
+<Parameter name="javax.servlet.context.tempdir"
+               value="C:/temp"
+               override="false"/>
 </Context>

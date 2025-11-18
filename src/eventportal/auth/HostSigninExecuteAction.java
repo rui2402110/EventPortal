@@ -44,7 +44,7 @@ public class HostSigninExecuteAction extends Action {
             session.setAttribute("user", user);
 
             //リダイレクト
-            url = "../hostmenu/HostMenu.action";
+            url = "../host/HostMenu.action";
             res.sendRedirect(url);
 
         } else {

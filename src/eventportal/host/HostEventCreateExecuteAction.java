@@ -1,4 +1,4 @@
-package eventportal.hostmenu;
+package eventportal.host;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,7 +13,6 @@ import bean.User;
 import dao.FileDao;
 import dao.HostEventDao;
 import tool.Action;
-
 public class HostEventCreateExecuteAction extends Action {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -21,7 +20,7 @@ public class HostEventCreateExecuteAction extends Action {
 		//メソッドとスタブ
 		HttpSession session = req.getSession();
 		User user = (User)session.getAttribute("user");
-		Event event = null ;
+		Event event = new Event();
 
 		// 使用するDAOを定義
 		HostEventDao hosEvtDao = new HostEventDao();
@@ -84,6 +83,9 @@ public class HostEventCreateExecuteAction extends Action {
             }
 
             LocalDate today = LocalDate.now();
+
+            System.out.println(mapImagePath);
+            System.out.println(innerMapImagePath);
 
             // セッターでEventクラスにデータを纏めていく
             event.setEventId(hosEvtDao.eventIdGet());

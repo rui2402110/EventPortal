@@ -27,26 +27,25 @@ public class HostEventDao extends Dao {
 					    "event_id, event_name, event_overview, holding_date, holding_time, " +
 					    "address, map_out_of_hall, map_in_hall, max_count, " +
 					    "phone_number, link, credit, user_id, ticket_info, event_hold_state, " +
-					    "event_add_date, total_payment" +
-					    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-				statement.setString(1, event.getEventId());
-		        statement.setString(2, event.getEventName());
-		        statement.setString(3, event.getEventOverview());
-		        statement.setObject(4, event.getHoldingDate());   // LocalDate → JDBC 4.2以降は setObjectでOK
-		        statement.setObject(5, event.getHoldingTime());   // LocalTime → 同上
-		        statement.setString(6, event.getAddress());
-		        statement.setString(7, event.getMapOutOfHall());
-		        statement.setString(8, event.getMapInHall());
-		        statement.setInt(9, event.getMaxCount());
-		        statement.setString(10, event.getCategoryId());
-		        statement.setString(11, event.getPhoneNumber());
-		        statement.setString(12, event.getLink());
-		        statement.setString(13, event.getCredit());
-		        statement.setString(14, event.getUserId());
-		        statement.setString(15, event.getTicketInfo());
-		        statement.setString(16, event.getEventHoldState());
-		        statement.setObject(17, event.getEventAddDate()); // LocalDate
-		        statement.setInt(18, event.getTotalPayment());
+					    "event_add_date" +
+					    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+					statement.setString(1, event.getEventId());
+					statement.setString(2, event.getEventName());
+					statement.setString(3, event.getEventOverview());
+					statement.setObject(4, event.getHoldingDate());
+					statement.setObject(5, event.getHoldingTime());
+					statement.setString(6, event.getAddress());
+					statement.setString(7, event.getMapOutOfHall());
+					statement.setString(8, event.getMapInHall());
+					statement.setInt(9, event.getMaxCount());
+					statement.setString(10, event.getPhoneNumber());
+					statement.setString(11, event.getLink());
+					statement.setString(12, event.getCredit());
+					statement.setString(13, event.getUserId());
+					statement.setString(14, event.getTicketInfo());
+					statement.setString(15, event.getEventHoldState());
+					statement.setObject(16, event.getEventAddDate());
 
 		        int affected = statement.executeUpdate();
 		        result = (affected > 0);

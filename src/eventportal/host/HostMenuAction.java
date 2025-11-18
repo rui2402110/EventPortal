@@ -1,4 +1,4 @@
-package eventportal.hostmenu;
+package eventportal.host;
 
 import java.util.List;
 

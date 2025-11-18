@@ -16,7 +16,7 @@
         <p>ログインユーザー: <strong>${sessionScope.user.user_id}</strong></p>
     </div>
 
-    <a href="${pageContext.request.contextPath}/eventportal/hostmenu/HostEventCreate.action">イベント新規作成</a>
+    <a href="${pageContext.request.contextPath}/eventportal/host/HostEventCreate.action">イベント新規作成</a>
 
     <div class="content">
 
@@ -45,7 +45,7 @@
                             <td>${evt.maxCount}</td>
                             <td>${evt.eventHoldState}</td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/eventportal/hostmenu/HostEventDetail.action?eventId=${evt.eventId}">詳細</a> |
+                                <a href="${pageContext.request.contextPath}/eventportal/host/HostEventDetail.action?eventId=${evt.eventId}">詳細</a> |
                                 <a href="EventEdit.action?id=${evt.eventId}">編集</a> |
                                 <a href="EventDelete.action?id=${evt.eventId}" onclick="return confirm('本当に削除しますか?')">削除</a>
                             </td>

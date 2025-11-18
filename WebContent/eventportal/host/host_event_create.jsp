@@ -102,7 +102,7 @@
 <div class="container">
     <h1>イベント入力フォーム</h1>
 
-   <form method="post" action="${pageContext.request.contextPath}/eventportal/hostmenu/HostEventCreateExecute.action">
+   <form method="post" enctype="multipart/form-data" action="${pageContext.request.contextPath}/eventportal/host/HostEventCreateExecute.action">
         <div class="form-group">
             <label for="event_name">イベント名</label>
             <input type="text" id="event_name" name="event_name" placeholder="例: ドキドキマヤ文明鎮魂祭" required>
@@ -309,16 +309,16 @@
         </div>
 
         <div class="form-group">
-            <label>会場マップ画像</label>
-            <input type="file" id="eventMapImage" accept="image/*" onchange="previewImage(event, 'mapPreview')">
-            <div class="preview" id="mapPreview"></div>
-        </div>
+    <label>会場マップ画像</label>
+    <input type="file" id="eventMapImage" name="eventMapImage" accept="image/*" onchange="previewImage(event, 'mapPreview')">
+    <div class="preview" id="mapPreview"></div>
+</div>
 
-        <div class="form-group">
-            <label>会場内マップ画像</label>
-            <input type="file" id="eventInnerMapImage" accept="image/*" onchange="previewImage(event, 'innerMapPreview')">
-            <div class="preview" id="innerMapPreview"></div>
-        </div>
+<div class="form-group">
+    <label>会場内マップ画像</label>
+    <input type="file" id="eventInnerMapImage" name="eventInnerMapImage" accept="image/*" onchange="previewImage(event, 'innerMapPreview')">
+    <div class="preview" id="innerMapPreview"></div>
+</div>
 
         <div class="form-group">
             <label for="maxcount">最大人数</label>

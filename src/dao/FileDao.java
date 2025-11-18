@@ -1,5 +1,6 @@
 package dao;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,44 +10,57 @@ public class FileDao extends Dao {
 	/**
      * アップロードされたファイルの名前を取得
      */
-    public String getFileName(Part part) {
-        String contentDisposition = part.getHeader("content-disposition");
-        for (String content : contentDisposition.split(";")) {
-            if (content.trim().startsWith("filename")) {
-                return content.substring(content.indexOf('=') + 1).trim().replace("\"", "");
-            }
-        }
-        return null;
-    }
+	public String getFileName(Part part) {
+	    // Java EE 7以降
+	    String fileName = part.getSubmittedFileName();
+
+	    if (fileName == null || fileName.isEmpty()) {
+	        return null;
+	    }
+
+	    // フルパスからファイル名のみを取得（念のため）
+	    int lastIndexOfSlash = Math.max(
+	        fileName.lastIndexOf('/'),
+	        fileName.lastIndexOf('\\')
+	    );
+
+	    if (lastIndexOfSlash >= 0) {
+	        fileName = fileName.substring(lastIndexOfSlash + 1);
+	    }
+
+	    return fileName;
+	}
 
 	/**
      * アップロードされたファイルを保存
      */
-    public String saveUploadedFile(Part part, String fileName, HttpServletRequest request)
-            throws IOException {
-
-        // 保存先ディレクトリの設定
-        String uploadPath = request.getServletContext().getRealPath("") + "/uploads/event_images";
-        java.io.File uploadDir = new java.io.File(uploadPath);
-
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
+    public String saveUploadedFile(Part filePart, String fileName, HttpServletRequest req) throws IOException {
+        if (filePart == null || fileName == null || fileName.isEmpty()) {
+            return null;
         }
 
-        // ファイル名の重複を避けるためにタイムスタンプを追加
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String extension = "";
-        if (fileName != null && fileName.lastIndexOf(".") > 0) {
-            extension = fileName.substring(fileName.lastIndexOf("."));
+        // WebContent/image フォルダの実際のパスを取得
+        String uploadDir = req.getServletContext().getRealPath("/image");
+        File uploadDirFile = new File(uploadDir);
+
+        // ディレクトリが存在しない場合は作成
+        if (!uploadDirFile.exists()) {
+            uploadDirFile.mkdirs();
         }
-        String uniqueFileName = timestamp + "_" + fileName;
 
-        // ファイル保存
-        String filePath = uploadPath + "/" + uniqueFileName;
-        part.write(filePath);
+        // ユニークなファイル名を生成
+        String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
 
-        // データベースに保存するパス（相対パス）
-        return "/uploads/event_images/" + uniqueFileName;
+        // 保存先の絶対パス
+        String filePath = uploadDir + File.separator + uniqueFileName;
+
+        System.out.println("保存先パス: " + filePath); // デバッグ用
+
+        // ファイルを保存
+        filePart.write(filePath);
+
+        // 相対パス（HTML/JSPからアクセスするパス）を返す
+        return "image/" + uniqueFileName;
     }
 
 }
