@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>イベントポータル - 認証</title>
   <style>
-  /* 基本スタイル */
+/* 基本スタイル */
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -31,6 +31,13 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+/* 日付と時刻の入力欄 */
+.form-group input[type="date"],
+.form-group input[type="time"] {
+    font-size: 16px;
+    padding: 10px;
 }
 
 .form-actions {
@@ -90,177 +97,6 @@
     color: #666;
     font-size: 12px;
 }
-
-/* カレンダー用スタイル */
-.calendar-container {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-}
-
-.calendar-input {
-    cursor: pointer;
-    background-color: #f8f9fa;
-}
-
-.calendar-popup {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 16px;
-    width: 320px;
-    display: none;
-}
-
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.calendar-nav-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.calendar-nav-btn:hover {
-    background-color: #f0f0f0;
-}
-
-.calendar-title {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.calendar-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-    margin-bottom: 8px;
-}
-
-.calendar-weekday {
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
-    color: #666;
-    padding: 8px 4px;
-}
-
-.calendar-days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-    margin-bottom: 16px;
-}
-
-.calendar-day {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.calendar-day:hover {
-    background-color: #e3f2fd;
-}
-
-.calendar-day.other-month {
-    color: #ccc;
-}
-
-.calendar-day.selected {
-    background-color: #2196f3;
-    color: white;
-}
-
-.calendar-day.today {
-    background-color: #e1f5fe;
-    color: #0277bd;
-    font-weight: bold;
-}
-
-.time-selectors {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.time-selector {
-    flex: 1;
-}
-
-.time-selector label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.time-selector select {
-    width: 100%;
-    padding: 4px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.selected-datetime {
-    background-color: #f5f5f5;
-    padding: 12px;
-    border-radius: 4px;
-    margin-bottom: 16px;
-    font-size: 14px;
-}
-
-.calendar-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-}
-
-.calendar-btn {
-    padding: 6px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.calendar-btn.primary {
-    background-color: #2196f3;
-    color: white;
-    border-color: #2196f3;
-}
-
-.calendar-btn:hover {
-    background-color: #f0f0f0;
-}
-
-.calendar-btn.primary:hover {
-    background-color: #1976d2;
-}
   </style>
 </head>
 <div class="container">
@@ -272,50 +108,123 @@
             <input type="text" id="event_name" name="event_name" placeholder="例: ドキドキマヤ文明鎮魂祭" required>
         </div>
 
+       <div class="form-group">
+            <label for="event_year">年</label>
+            <select id="event_year" name="event_year" required>
+                <option value="">選択してください</option>
+                <option value="2024">2024年</option>
+                <option value="2025">2025年</option>
+                <option value="2026">2026年</option>
+                <option value="2027">2027年</option>
+                <option value="2028">2028年</option>
+            </select>
+        </div>
+
         <div class="form-group">
-            <label for="days">日時</label>
-            <div class="calendar-container">
-                <input type="text" id="days" name="days" class="calendar-input" placeholder="日時を選択してください" readonly required>
-                <div id="calendar-popup" class="calendar-popup">
-                    <div class="calendar-header">
-                        <button type="button" class="calendar-nav-btn" id="prev-month">‹</button>
-                        <div class="calendar-title" id="calendar-title"></div>
-                        <button type="button" class="calendar-nav-btn" id="next-month">›</button>
-                    </div>
+            <label for="event_month">月</label>
+            <select id="event_month" name="event_month" required>
+                <option value="">選択してください</option>
+                <option value="1">1月</option>
+                <option value="2">2月</option>
+                <option value="3">3月</option>
+                <option value="4">4月</option>
+                <option value="5">5月</option>
+                <option value="6">6月</option>
+                <option value="7">7月</option>
+                <option value="8">8月</option>
+                <option value="9">9月</option>
+                <option value="10">10月</option>
+                <option value="11">11月</option>
+                <option value="12">12月</option>
+            </select>
+        </div>
 
-                    <div class="calendar-weekdays">
-                        <div class="calendar-weekday">日</div>
-                        <div class="calendar-weekday">月</div>
-                        <div class="calendar-weekday">火</div>
-                        <div class="calendar-weekday">水</div>
-                        <div class="calendar-weekday">木</div>
-                        <div class="calendar-weekday">金</div>
-                        <div class="calendar-weekday">土</div>
-                    </div>
+        <div class="form-group">
+            <label for="event_day">日</label>
+            <select id="event_day" name="event_day" required>
+                <option value="">選択してください</option>
+                <option value="1">1日</option>
+                <option value="2">2日</option>
+                <option value="3">3日</option>
+                <option value="4">4日</option>
+                <option value="5">5日</option>
+                <option value="6">6日</option>
+                <option value="7">7日</option>
+                <option value="8">8日</option>
+                <option value="9">9日</option>
+                <option value="10">10日</option>
+                <option value="11">11日</option>
+                <option value="12">12日</option>
+                <option value="13">13日</option>
+                <option value="14">14日</option>
+                <option value="15">15日</option>
+                <option value="16">16日</option>
+                <option value="17">17日</option>
+                <option value="18">18日</option>
+                <option value="19">19日</option>
+                <option value="20">20日</option>
+                <option value="21">21日</option>
+                <option value="22">22日</option>
+                <option value="23">23日</option>
+                <option value="24">24日</option>
+                <option value="25">25日</option>
+                <option value="26">26日</option>
+                <option value="27">27日</option>
+                <option value="28">28日</option>
+                <option value="29">29日</option>
+                <option value="30">30日</option>
+                <option value="31">31日</option>
+            </select>
+        </div>
 
-                    <div class="calendar-days" id="calendar-days"></div>
+        <div class="form-group">
+            <label for="event_hour">時</label>
+            <select id="event_hour" name="event_hour" required>
+                <option value="">選択してください</option>
+                <option value="0">0時</option>
+                <option value="1">1時</option>
+                <option value="2">2時</option>
+                <option value="3">3時</option>
+                <option value="4">4時</option>
+                <option value="5">5時</option>
+                <option value="6">6時</option>
+                <option value="7">7時</option>
+                <option value="8">8時</option>
+                <option value="9">9時</option>
+                <option value="10">10時</option>
+                <option value="11">11時</option>
+                <option value="12">12時</option>
+                <option value="13">13時</option>
+                <option value="14">14時</option>
+                <option value="15">15時</option>
+                <option value="16">16時</option>
+                <option value="17">17時</option>
+                <option value="18">18時</option>
+                <option value="19">19時</option>
+                <option value="20">20時</option>
+                <option value="21">21時</option>
+                <option value="22">22時</option>
+                <option value="23">23時</option>
+            </select>
+        </div>
 
-                    <div class="time-selectors">
-                        <div class="time-selector">
-                            <label>時</label>
-                            <select id="hour-select"></select>
-                        </div>
-                        <div class="time-selector">
-                            <label>分</label>
-                            <select id="minute-select"></select>
-                        </div>
-                    </div>
-
-                    <div class="selected-datetime">
-                        <strong>選択中:</strong> <span id="selected-display">未選択</span>
-                    </div>
-
-                    <div class="calendar-buttons">
-                        <button type="button" class="calendar-btn" id="calendar-cancel">キャンセル</button>
-                        <button type="button" class="calendar-btn primary" id="calendar-confirm">決定</button>
-                    </div>
-                </div>
-            </div>
+        <div class="form-group">
+            <label for="event_minute">分</label>
+            <select id="event_minute" name="event_minute" required>
+                <option value="">選択してください</option>
+                <option value="0">0分</option>
+                <option value="5">5分</option>
+                <option value="10">10分</option>
+                <option value="15">15分</option>
+                <option value="20">20分</option>
+                <option value="25">25分</option>
+                <option value="30">30分</option>
+                <option value="35">35分</option>
+                <option value="40">40分</option>
+                <option value="45">45分</option>
+                <option value="50">50分</option>
+                <option value="55">55分</option>
+            </select>
         </div>
 
         <div class="form-group">
@@ -452,233 +361,3 @@
         </div>
     </div>
 </div>
-<script>
-//グローバル変数
-let currentCalendarDate = new Date();
-let selectedDateTime = new Date();
-let isCalendarOpen = false;
-
-// DOM要素
-const calendarInput = document.getElementById('days');
-const calendarPopup = document.getElementById('calendar-popup');
-const calendarTitle = document.getElementById('calendar-title');
-const calendarDays = document.getElementById('calendar-days');
-const hourSelect = document.getElementById('hour-select');
-const minuteSelect = document.getElementById('minute-select');
-const selectedDisplay = document.getElementById('selected-display');
-const prevMonthBtn = document.getElementById('prev-month');
-const nextMonthBtn = document.getElementById('next-month');
-const calendarCancelBtn = document.getElementById('calendar-cancel');
-const calendarConfirmBtn = document.getElementById('calendar-confirm');
-
-// カレンダー初期化
-function initializeCalendar() {
-    // 時間の選択肢を生成
-    hourSelect.innerHTML = '';
-    for (let i = 0; i < 24; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i.toString().padStart(2, '0') + '時';
-        hourSelect.appendChild(option);
-    }
-
-    // 分の選択肢を生成(5分刻み)
-    minuteSelect.innerHTML = '';
-    for (let i = 0; i < 60; i += 5) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i.toString().padStart(2, '0') + '分';
-        minuteSelect.appendChild(option);
-    }
-
-    // デフォルト時間を現在時刻に設定
-    const now = new Date();
-    selectedDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), Math.floor(now.getMinutes() / 5) * 5);
-    currentCalendarDate = new Date(selectedDateTime);
-
-    hourSelect.value = selectedDateTime.getHours();
-    minuteSelect.value = selectedDateTime.getMinutes();
-
-    updateCalendarDisplay();
-    updateSelectedDisplay();
-}
-
-// カレンダー表示更新
-function updateCalendarDisplay() {
-    const year = currentCalendarDate.getFullYear();
-    const month = currentCalendarDate.getMonth();
-
-    calendarTitle.textContent = `${year}年 ${month + 1}月`;
-
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysInPrevMonth = new Date(year, month, 0).getDate();
-
-    calendarDays.innerHTML = '';
-
-    // 前月の日付
-    for (let i = firstDay - 1; i >= 0; i--) {
-        const day = daysInPrevMonth - i;
-        const dayElement = createDayElement(day, true, false, false);
-        calendarDays.appendChild(dayElement);
-    }
-
-    // 今月の日付
-    const today = new Date();
-    for (let day = 1; day <= daysInMonth; day++) {
-        const isToday = (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day);
-        const isSelected = (selectedDateTime.getFullYear() === year && selectedDateTime.getMonth() === month && selectedDateTime.getDate() === day);
-        const dayElement = createDayElement(day, false, isToday, isSelected);
-        calendarDays.appendChild(dayElement);
-    }
-
-    // 次月の日付(42セル埋めるため)
-    const totalCells = 42;
-    const currentCells = firstDay + daysInMonth;
-    for (let day = 1; currentCells + day - 1 < totalCells; day++) {
-        const dayElement = createDayElement(day, true, false, false);
-        calendarDays.appendChild(dayElement);
-    }
-}
-
-// 日付要素作成
-function createDayElement(day, isOtherMonth, isToday, isSelected) {
-    const dayElement = document.createElement('button');
-    dayElement.type = 'button';
-    dayElement.className = 'calendar-day';
-    dayElement.textContent = day;
-
-    if (isOtherMonth) {
-        dayElement.classList.add('other-month');
-    }
-    if (isToday) {
-        dayElement.classList.add('today');
-    }
-    if (isSelected) {
-        dayElement.classList.add('selected');
-    }
-
-    dayElement.addEventListener('click', () => {
-        if (isOtherMonth) {
-            // 前月・次月の日付をクリックした場合は月を移動
-            if (day > 15) {
-                // 前月
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-            } else {
-                // 次月
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-            }
-        }
-
-        // 選択日を更新
-        selectedDateTime.setFullYear(currentCalendarDate.getFullYear());
-        selectedDateTime.setMonth(currentCalendarDate.getMonth());
-        selectedDateTime.setDate(day);
-
-        updateCalendarDisplay();
-        updateSelectedDisplay();
-    });
-
-    return dayElement;
-}
-
-// 選択中の日時表示更新
-function updateSelectedDisplay() {
-    const year = selectedDateTime.getFullYear();
-    const month = selectedDateTime.getMonth() + 1;
-    const date = selectedDateTime.getDate();
-    const hour = selectedDateTime.getHours();
-    const minute = selectedDateTime.getMinutes();
-    const weekday = ['日', '月', '火', '水', '木', '金', '土'][selectedDateTime.getDay()];
-
-    selectedDisplay.textContent = `${year}年${month}月${date}日(${weekday}) ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-}
-
-// カレンダーポップアップの表示/非表示
-function toggleCalendar() {
-    if (isCalendarOpen) {
-        calendarPopup.style.display = 'none';
-        isCalendarOpen = false;
-    } else {
-        // カレンダーを開く前に現在の入力値を確認
-        const currentValue = calendarInput.value;
-        if (currentValue) {
-            // 既に入力されている値がある場合は、その値をカレンダーに反映
-            const dateTimeMatch = currentValue.match(/(\d{4})年(\d{1,2})月(\d{1,2})日.*?(\d{1,2}):(\d{2})/);
-            if (dateTimeMatch) {
-                const [, year, month, date, hour, minute] = dateTimeMatch;
-                selectedDateTime = new Date(
-                    parseInt(year),
-                    parseInt(month) - 1,
-                    parseInt(date),
-                    parseInt(hour),
-                    parseInt(minute)
-                );
-                currentCalendarDate = new Date(selectedDateTime);
-
-                // セレクトボックスの値も更新
-                hourSelect.value = selectedDateTime.getHours();
-                minuteSelect.value = selectedDateTime.getMinutes();
-
-                updateCalendarDisplay();
-                updateSelectedDisplay();
-            }
-        }
-
-        calendarPopup.style.display = 'block';
-        isCalendarOpen = true;
-    }
-}
-
-// カレンダーイベントリスナー設定
-function setupCalendarEventListeners() {
-    // カレンダー関連
-    calendarInput.addEventListener('click', toggleCalendar);
-
-    prevMonthBtn.addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-        updateCalendarDisplay();
-    });
-
-    nextMonthBtn.addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-        updateCalendarDisplay();
-    });
-
-    hourSelect.addEventListener('change', (e) => {
-        selectedDateTime.setHours(parseInt(e.target.value));
-        updateSelectedDisplay();
-    });
-
-    minuteSelect.addEventListener('change', (e) => {
-        selectedDateTime.setMinutes(parseInt(e.target.value));
-        updateSelectedDisplay();
-    });
-
-    calendarCancelBtn.addEventListener('click', () => {
-        toggleCalendar();
-    });
-
-    calendarConfirmBtn.addEventListener('click', () => {
-        const year = selectedDateTime.getFullYear();
-        const month = selectedDateTime.getMonth() + 1;
-        const date = selectedDateTime.getDate();
-        const hour = selectedDateTime.getHours();
-        const minute = selectedDateTime.getMinutes();
-        const weekday = ['日', '月', '火', '水', '木', '金', '土'][selectedDateTime.getDay()];
-
-        calendarInput.value = `${year}年${month}月${date}日(${weekday}) ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        toggleCalendar();
-    });
-
-    // カレンダー外をクリックで閉じる
-    document.addEventListener('click', (e) => {
-        if (!calendarInput.contains(e.target) && !calendarPopup.contains(e.target)) {
-            if (isCalendarOpen) {
-                calendarPopup.style.display = 'none';
-                isCalendarOpen = false;
-            }
-        }
-    });
-}
-</script>
