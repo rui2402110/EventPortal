@@ -5,6 +5,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%-- base.jsp を読み込み --%>
+
   <title>イベントポータル - 認証</title>
 </head>
 <body>
@@ -13,6 +15,8 @@
     <div class="user-info">
         <p>ログインユーザー: <strong>${sessionScope.user.user_id}</strong></p>
     </div>
+
+    <a href="${pageContext.request.contextPath}/eventportal/hostmenu/HostEventCreate.action">イベント新規作成</a>
 
     <div class="content">
 
