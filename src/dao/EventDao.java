@@ -44,7 +44,6 @@ public class EventDao extends Dao {
 			    event.setMapOutOfHall(resultSet.getString("map_out_of_hall"));
 			    event.setMapInHall(resultSet.getString("map_in_hall"));
 			    event.setMaxCount(resultSet.getInt("max_count"));
-			    event.setCategoryId(resultSet.getString("category_id"));
 			    event.setPhoneNumber(resultSet.getString("phone_number"));
 			    event.setLink(resultSet.getString("link"));
 			    event.setCredit(resultSet.getString("credit"));
@@ -111,7 +110,6 @@ public class EventDao extends Dao {
 			    event.setMapOutOfHall(resultSet.getString("map_out_of_hall"));
 			    event.setMapInHall(resultSet.getString("map_in_hall"));
 			    event.setMaxCount(resultSet.getInt("max_count"));
-			    event.setCategoryId(resultSet.getString("category_id"));
 			    event.setPhoneNumber(resultSet.getString("phone_number"));
 			    event.setLink(resultSet.getString("link"));
 			    event.setCredit(resultSet.getString("credit"));
@@ -177,7 +175,6 @@ public class EventDao extends Dao {
 			    event.setMapOutOfHall(resultSet.getString("map_out_of_hall"));
 			    event.setMapInHall(resultSet.getString("map_in_hall"));
 			    event.setMaxCount(resultSet.getInt("max_count"));
-			    event.setCategoryId(resultSet.getString("category_id"));
 			    event.setPhoneNumber(resultSet.getString("phone_number"));
 			    event.setLink(resultSet.getString("link"));
 			    event.setCredit(resultSet.getString("credit"));

@@ -102,7 +102,7 @@
 <div class="container">
     <h1>イベント入力フォーム</h1>
 
-    <form id="addressForm">
+   <form method="post" action="${pageContext.request.contextPath}/eventportal/hostmenu/HostEventCreateExecute.action">
         <div class="form-group">
             <label for="event_name">イベント名</label>
             <input type="text" id="event_name" name="event_name" placeholder="例: ドキドキマヤ文明鎮魂祭" required>
