@@ -105,7 +105,7 @@ public class CategoryDao extends Dao {
     }
 
 	// event_categoryにデータを追加するメソッド
-	public void eventCategoryAdd(String eventId , String categoryId){
+	public void eventCategoryAdd(String eventId , String categoryId) throws Exception{
 		// コネクションを確立
 		Connection connection = getConnection();
 		// プリペアードステートメント
