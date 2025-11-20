@@ -39,7 +39,7 @@ public class HostEventCreateExecuteAction extends Action {
             String hour = req.getParameter("event_hour");
             String minute = req.getParameter("event_minute");
 
-         // LocalDateとLocalTimeに変換
+            // LocalDateとLocalTimeに変換
             LocalDate holdingDate = LocalDate.of(
                 Integer.parseInt(year),
                 Integer.parseInt(month),
