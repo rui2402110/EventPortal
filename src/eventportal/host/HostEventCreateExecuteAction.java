@@ -10,6 +10,7 @@ import javax.servlet.http.Part;
 
 import bean.Event;
 import bean.User;
+import dao.CategoryDao;
 import dao.FileDao;
 import dao.HostEventDao;
 import tool.Action;
@@ -25,6 +26,7 @@ public class HostEventCreateExecuteAction extends Action {
 		// 使用するDAOを定義
 		HostEventDao hosEvtDao = new HostEventDao();
 		FileDao fileDao = new FileDao();
+		CategoryDao CatDao = new CategoryDao();
 
             // イベント基本情報の取得
             String eventName = req.getParameter("event_name");
@@ -87,8 +89,10 @@ public class HostEventCreateExecuteAction extends Action {
             System.out.println(mapImagePath);
             System.out.println(innerMapImagePath);
 
+            String eventId = hosEvtDao.eventIdGet();
+
             // セッターでEventクラスにデータを纏めていく
-            event.setEventId(hosEvtDao.eventIdGet());
+            event.setEventId(eventId);
             event.setEventName(eventName);
             event.setEventOverview(content);
             event.setAddress(postalCode + prefecture + city + street + building);
@@ -110,6 +114,11 @@ public class HostEventCreateExecuteAction extends Action {
 
             // INSERT処理を実行
             hosEvtDao.eventCreate(event);
+
+            // カテゴリを登録
+            CatDao.categoryAdd(category);
+            String categoryId = CatDao.get(eventId);
+            CatDao.eventCategoryAdd(eventId , categoryId);
 
             // イベント作成後、作成完了ページに飛ぶ
             req.getRequestDispatcher("event_create_done.jsp").forward(req, res);
