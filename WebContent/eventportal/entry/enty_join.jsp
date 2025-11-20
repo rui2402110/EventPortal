@@ -134,8 +134,11 @@
 <div class="popup" id="popup">
     <div class="popup-content">
         <p>このイベントに参加しますか？</p>
-        <button class="btn btn-return" onclick="closePopup()">戻る</button>
-        <button class="btn btn-attend" onclick="closePopup()">参加する</button>
+        <form action="EntryJoinExecuteAction" method="post" id="attendForm">
+           <input type="hidden" name="eventId" value="" />
+            <button type="button" class="btn btn-return" onclick="closePopup()">戻る</button>
+            <button type="submit" class="btn btn-attend">参加する</button>
+        </form>
     </div>
 </div>
 

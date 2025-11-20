@@ -38,7 +38,7 @@
                             <td>${evt.maxCount}</td>
                             <td>${evt.eventHoldState}</td>
                             <td>
-                                <a href="EventDetail.action?id=${evt.eventId}">参加する</a> |
+                                <a href="EntryJoin.action?id=${evt.eventId}">参加する</a> |
                             </td>
                         </tr>
                     </c:forEach>
