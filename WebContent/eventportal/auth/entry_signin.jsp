@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>イベントポータル - 参加者サインイン</title>
+    <!-- 共通CSS -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/common/style.css">
 </head>
 <body>
   <div class="container">
@@ -19,32 +21,32 @@
 
         <div class="form-group">
           <label for="id">ID</label>
-          <input type="text" id="id" name="id" placeholder="IDを入力する">
+          <input type="text" id="textbox" name="id" placeholder="IDを入力する">
         </div>
 
         <div class="form-group">
           <label for="id">ユーザー名</label>
-          <input type="text" id="user_name" name="user_name" placeholder="ユーザー名を入力する">
+          <input type="text" id="textbox" name="user_name" placeholder="ユーザー名を入力する">
         </div>
 
         <div class="form-group">
           <label for="password">PASSWORD</label>
-          <input type="password" id="password" name="password" placeholder="パスワードを入力する">
+          <input type="password" id="textbox" name="password" placeholder="パスワードを入力する">
         </div>
 
         <div class="form-group">
           <label for="password_conf">PASSWORD確認</label>
-          <input type="password" id="password_conf" name="password_conf" placeholder="パスワードを再度入力する">
+          <input type="password" id="textbox" name="password_conf" placeholder="パスワードを再度入力する">
         </div>
 
         <div class="form-group">
           <label for="mail_address">メールアドレス</label>
-          <input type="text" id="mail_address" name="mail_address" placeholder="メールアドレスを入力する">
+          <input type="text" id="textbox" name="mail_address" placeholder="メールアドレスを入力する">
         </div>
 
 		<div class="form-group">
           <label for="phone_number">電話番号</label>
-          <input type="text" id="phone_number" name="phone_number" placeholder="電話番号を入力する">
+          <input type="text" id="textbox" name="phone_number" placeholder="電話番号を入力する">
         </div>
 
         <!-- エラー1 -->

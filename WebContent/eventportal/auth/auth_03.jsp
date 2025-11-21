@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>イベントポータル - 主催者ログイン</title>
+    <!-- 共通CSS -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/common/style.css">
 </head>
 <body>
   <div class="container">
@@ -19,12 +21,12 @@
 
         <div class="form-group">
           <label for="id_input">ID</label>
-          <input type="text" id="id_input" name="id" placeholder="IDを入力する">
+          <input type="text" id="textbox" name="id" placeholder="IDを入力する">
         </div>
 
         <div class="form-group">
           <label for="password_input">PASSWORD</label>
-          <input type="password" id="password_input" name="password" placeholder="パスワードを入力する">
+          <input type="password" id="textbox" name="password" placeholder="パスワードを入力する">
         </div>
 
         <!-- エラー1 -->

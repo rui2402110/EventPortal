@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- 共通CSS -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/common/style.css">
     <title>ログイン区分選択 | イベントポータル</title>
 </head>
 <body>

@@ -137,7 +137,7 @@
         <form action="EntryJoinExecuteAction" method="post" id="attendForm">
            <input type="hidden" name="eventId" value="" />
             <button type="button" class="btn btn-return" onclick="closePopup()">戻る</button>
-            <button type="submit" class="btn btn-attend">参加する</button>
+            <button type="submit" class="btn btn-attend"onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/EntryJoinExecute.action'">参加する</button>
         </form>
     </div>
 </div>

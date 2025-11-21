@@ -26,10 +26,12 @@ public class EntryJoinExecuteAction extends Action {
 
             if (result == true) {
                 // 登録成功
+            	System.out.println("参加登録成功");
                 req.setAttribute("successMessage", "イベントへの参加登録が完了しました");
                 res.sendRedirect("entry_event_list.jsp?eventId=" + eventId);
             } else {
                 // 登録失敗
+            	System.out.println("参加登録失敗");
                 req.setAttribute("errorMessage", "参加登録に失敗しました");
                 req.getRequestDispatcher("entry_join.jsp").forward(req, res);
             }
