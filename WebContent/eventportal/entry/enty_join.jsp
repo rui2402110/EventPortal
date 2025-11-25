@@ -1,4 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -105,12 +107,38 @@
 
     footer { text-align: center; margin-top: 40px; color: #666; font-size: 12px; }
 
+    .footer-bar {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background: #e9e9e9;
+        padding: 8px 0;
+        box-shadow: 0 -2px 0 rgba(0,0,0,0.06);
+    }
 
-.footer-bar { position: fixed; left: 0; bottom: 0; width: 100%; background: #e9e9e9; padding: 8px 0; box-shadow: 0 -2px 0 rgba(0,0,0,0.06); }
-.footer-inner { width: 90%; max-width: 1100px; margin: 0 auto; text-align: center; color: #666; font-size: 12px; }
-.footer-inner .year { margin-right: 8px; font-weight: 600; }
-.footer-inner .dots { display: inline-block; width: 60%; vertical-align: middle; border-bottom: 1px dotted #666; margin-left: 8px; transform: translateY(-3px); }
+    .footer-inner {
+        width: 90%;
+        max-width: 1100px;
+        margin: 0 auto;
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+    }
 
+    .footer-inner .year {
+        margin-right: 8px;
+        font-weight: 600;
+    }
+
+    .footer-inner .dots {
+        display: inline-block;
+        width: 60%;
+        vertical-align: middle;
+        border-bottom: 1px dotted #666;
+        margin-left: 8px;
+        transform: translateY(-3px);
+    }
 </style>
 </head>
 <body>
@@ -118,26 +146,41 @@
 <div class="header">イベントポータル</div>
 
 <div class="container">
-    <div class="event-box">
-        <div class="event-title">イベント名：＊＊＊＊＊</div>
+    <c:choose>
+        <c:when test="${not empty evt}">
+            <div class="event-box">
+                <div class="event-title">イベント名：<c:out value="${evt.eventName}" /></div>
 
-        <div><span class="label">開催日時：</span>＊＊＊＊＊</div>
-        <div><span class="label">会場名：</span>＊＊＊＊＊</div>
-        <div><span class="label">主催者名：</span>＊＊＊＊＊</div>
-        <div><span class="label">ステータス：</span>＊＊＊＊＊</div>
+                <div>
+                    <span class="label">開催日時：</span>
+                    <c:out value="${evt.holdingDate}" />
+                    <c:if test="${not empty evt.holdingTime}">
+                        <c:out value="${evt.holdingTime}" />
+                    </c:if>
+                </div>
+                <div><span class="label">会場名：</span><c:out value="${evt.address}" /></div>
+                <div><span class="label">主催者名：</span><c:out value="${evt.userId}" /></div>
+                <div><span class="label">ステータス：</span><c:out value="${evt.eventHoldState}" /></div>
 
-        <button class="btn btn-attend" onclick="openPopup()">参加する</button>
-    </div>
+                <button class="btn btn-attend" onclick="openPopup()">参加する</button>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="error-box">
+                イベント情報が取得できませんでした。
+            </div>
+        </c:otherwise>
+    </c:choose>
 </div>
 
 <!-- ポップアップ -->
 <div class="popup" id="popup">
     <div class="popup-content">
         <p>このイベントに参加しますか？</p>
-        <form action="EntryJoinExecuteAction" method="post" id="attendForm">
-           <input type="hidden" name="eventId" value="" />
+        <form action="${pageContext.request.contextPath}/eventportal/entrymenu/EntryJoinExecute.action" method="post" id="attendForm">
+            <input type="hidden" name="eventId" value="<c:out value='${evt.eventId}' />" />
             <button type="button" class="btn btn-return" onclick="closePopup()">戻る</button>
-            <button type="submit" class="btn btn-attend"onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/EntryJoinExecute.action'">参加する</button>
+            <button type="submit" class="btn btn-attend">参加する</button>
         </form>
     </div>
 </div>

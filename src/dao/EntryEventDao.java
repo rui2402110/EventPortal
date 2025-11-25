@@ -15,7 +15,6 @@ public class EntryEventDao extends Dao {
 			statement = connection.prepareStatement("INSERT INTO EVENT_ENTRYS (event_id , user_id , status)VALUES(? , ? , 2)");
 			statement.setString(1 ,userId);
 			statement.setString(2 ,eventId);
-			statement.executeUpdate();
 			int affected = statement.executeUpdate();
 	        result = (affected > 0);
 		} catch (Exception e) {
