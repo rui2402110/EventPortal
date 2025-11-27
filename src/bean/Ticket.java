@@ -3,20 +3,26 @@ package bean;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * チケット情報を保持するBeanクラス
+ */
 public class Ticket implements Serializable {
-    private String ticketId;
-    private String userId;
-    private String eventId;
-    private String qrImagePath;
-    private int status;  // 1:有効, 2:使用済み, 3:無効
-    private String ticketInfo;
-    private LocalDateTime createdAt;
-    private LocalDateTime usedAt;
+    private String ticketId;           // チケットID
+    private String userId;             // ユーザーID
+    private String eventId;            // イベントID
+    private String qrImagePath;        // QRコード画像ファイルパス
+    private String qrImageData;        // QRコード画像データ（Base64）
+    private int status;                // ステータス（1:有効, 2:使用済み, 3:無効）
+    private String ticketInfo;         // チケット情報（座席番号など）
+    private LocalDateTime createdAt;   // 作成日時
+    private LocalDateTime usedAt;      // 使用日時
+    private Event event;               // イベント情報（JOIN用）
 
-    // イベント情報（結合用）
-    private Event event;
+    // コンストラクタ
+    public Ticket() {
+    }
 
-    // ゲッター・セッター
+    // Getter & Setter
     public String getTicketId() {
         return ticketId;
     }
@@ -47,6 +53,14 @@ public class Ticket implements Serializable {
 
     public void setQrImagePath(String qrImagePath) {
         this.qrImagePath = qrImagePath;
+    }
+
+    public String getQrImageData() {
+        return qrImageData;
+    }
+
+    public void setQrImageData(String qrImageData) {
+        this.qrImageData = qrImageData;
     }
 
     public int getStatus() {
@@ -87,5 +101,31 @@ public class Ticket implements Serializable {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    // ユーティリティメソッド
+    public boolean isValid() {
+        return status == 1;
+    }
+
+    public boolean isUsed() {
+        return status == 2;
+    }
+
+    public boolean isInvalid() {
+        return status == 3;
+    }
+
+    public String getStatusText() {
+        switch (status) {
+            case 1:
+                return "有効";
+            case 2:
+                return "使用済み";
+            case 3:
+                return "無効";
+            default:
+                return "不明";
+        }
     }
 }

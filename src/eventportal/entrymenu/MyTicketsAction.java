@@ -11,10 +11,12 @@ import bean.User;
 import dao.TicketDao;
 import tool.Action;
 
+/**
+ * マイチケット一覧表示アクション
+ */
 public class MyTicketsAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        // セッションからユーザー情報を取得
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
 
@@ -23,16 +25,12 @@ public class MyTicketsAction extends Action {
             return;
         }
 
-        // DAOインスタンス作成
         TicketDao ticketDao = new TicketDao();
-
-        // ユーザーの全チケットを取得
         List<Ticket> tickets = ticketDao.getByUserId(user.getUser_id());
 
-        // JSPにデータを渡す
-        req.setAttribute("tickets", tickets);
+        System.out.println("マイチケット取得: ユーザーID=" + user.getUser_id() + ", チケット数=" + tickets.size());
 
-        // JSPへフォワード
-        req.getRequestDispatcher("/eventportal/entry/my_tickets.jsp").forward(req, res);
+        req.setAttribute("tickets", tickets);
+        req.getRequestDispatcher("/eventportal/qr/my_tickets.jsp").forward(req, res);
     }
 }
