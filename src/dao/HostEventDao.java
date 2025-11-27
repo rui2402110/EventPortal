@@ -175,6 +175,37 @@ public class HostEventDao extends Dao {
 			}
 		}
 	}
+	public boolean eventUpdate(String eventId , Event event) throws Exception {
+		// コネクションを確立
+				Connection connection = getConnection();
+				// プリペアードステートメント
+				PreparedStatement statement = null;
+				// Daoを定義
+				EventDao eventDao = new EventDao();
 
-
-}
+				boolean result = false;
+				try {
+					statement = connection.prepareStatement("UPDATE events SET title = '新しいタイトル' WHERE event_id = 123;");
+					return true ;
+				} catch (Exception e) {
+					throw e;
+				} finally {
+					// プリペアードステートメントを閉じる
+					if (statement != null) {
+						try {
+							statement.close();
+						} catch (SQLException sqle) {
+							throw sqle;
+						}
+					}
+					// コネクションを閉じる
+					if (connection != null) {
+						try {
+							connection.close();
+						} catch (SQLException sqle) {
+							throw sqle;
+						}
+					}
+				}
+			}
+	}
