@@ -135,5 +135,77 @@ public class HostEventDao extends Dao {
         return prefix + String.format("%0" + idLen + "d", number);
     }
 
+	// 開催状況を取得するメソッド
+	public String getEventStatement(String eventId)  throws Exception  {
+		// コネクションを確立
+		Connection connection = getConnection();
+		// プリペアードステートメント
+		PreparedStatement statement = null;
+		try {
+			statement = connection.prepareStatement("SELECT EVENT_HOLD_STATE FROM events WHERE event_id = ? ORDER BY event_id DESC");
+			statement.setString(1,eventId);
+			// SQL文の実行
+			ResultSet resultSet = statement.executeQuery();
 
-}
+			// EVENT_HOLD_STATEを結果から取得、イベントidが存在しない場合は"0"をリターン
+			if (resultSet.next()) {
+			    String eventHoldState = resultSet.getString("event_hold_state");
+			    return eventHoldState != null ? eventHoldState : "0";
+			} else {
+                return "0";
+            }
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			// プリペアードステートメントを閉じる
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+			// コネクションを閉じる
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+		}
+	}
+	public boolean eventUpdate(String eventId , Event event) throws Exception {
+		// コネクションを確立
+				Connection connection = getConnection();
+				// プリペアードステートメント
+				PreparedStatement statement = null;
+				// Daoを定義
+				EventDao eventDao = new EventDao();
+
+				boolean result = false;
+				try {
+					statement = connection.prepareStatement("UPDATE events SET title = '新しいタイトル' WHERE event_id = 123;");
+					return true ;
+				} catch (Exception e) {
+					throw e;
+				} finally {
+					// プリペアードステートメントを閉じる
+					if (statement != null) {
+						try {
+							statement.close();
+						} catch (SQLException sqle) {
+							throw sqle;
+						}
+					}
+					// コネクションを閉じる
+					if (connection != null) {
+						try {
+							connection.close();
+						} catch (SQLException sqle) {
+							throw sqle;
+						}
+					}
+				}
+			}
+	}
