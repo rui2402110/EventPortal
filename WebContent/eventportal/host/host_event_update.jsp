@@ -358,7 +358,7 @@
             <% if (event != null && event.getMapOutOfHall() != null && !event.getMapOutOfHall().isEmpty()) { %>
                 <div class="current-image">
                     <p>現在の画像:</p>
-                    <img src="<%= event.getMapOutOfHall() %>" alt="会場マップ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <img src="${pageContext.request.contextPath}/<%= event.getMapOutOfHall() %>" alt="会場マップ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <p style="display:none; color: #999;">画像を読み込めませんでした: <%= event.getMapOutOfHall() %></p>
                     <p>新しい画像を選択すると上書きされます</p>
                 </div>
@@ -374,7 +374,7 @@
             <% if (event != null && event.getMapInHall() != null && !event.getMapInHall().isEmpty()) { %>
                 <div class="current-image">
                     <p>現在の画像:</p>
-                    <img src="<%= event.getMapInHall() %>" alt="会場内マップ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <img src="${pageContext.request.contextPath}/<%= event.getMapInHall() %>" alt="会場内マップ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <p style="display:none; color: #999;">画像を読み込めませんでした: <%= event.getMapInHall() %></p>
                     <p>新しい画像を選択すると上書きされます</p>
                 </div>
