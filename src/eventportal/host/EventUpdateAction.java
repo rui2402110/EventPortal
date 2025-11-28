@@ -31,4 +31,5 @@ public class EventUpdateAction extends Action {
 	req.setAttribute("evt", event);
 	req.getRequestDispatcher("/eventportal/host/host_event_update.jsp").forward(req, res);
     // host_event.jspへフォワードする
-	}}
+	}
+}

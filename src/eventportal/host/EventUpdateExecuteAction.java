@@ -49,13 +49,6 @@ public class EventUpdateExecuteAction extends Action {
 	// イベント名
 	String eventName = req.getParameter("event_name");
 
-	// 開催日時（年月日時分）
-	String eventYear = req.getParameter("event_year");
-	String eventMonth = req.getParameter("event_month");
-	String eventDay = req.getParameter("event_day");
-	String eventHour = req.getParameter("event_hour");
-	String eventMinute = req.getParameter("event_minute");
-
 	// 概要
 	String content = req.getParameter("content");
 
@@ -89,7 +82,6 @@ public class EventUpdateExecuteAction extends Action {
 
 	// その他の項目
 	String maxCount = req.getParameter("maxcount");
-	String category = req.getParameter("category");
 	String phoneNumber = req.getParameter("phonenumber");
 	String link = req.getParameter("link");
 	String credit = req.getParameter("credit");
@@ -107,7 +99,8 @@ public class EventUpdateExecuteAction extends Action {
     event.setLink(link);
     event.setMaxCount(Integer.parseInt(maxCount));
     event.setPhoneNumber(phoneNumber);
+    event.setCredit(credit);
 
     // INSERT処理を実行
-    hosEvtDao.eventUpdate(event);
+    boolean result = hosEvtDao.eventUpdate(eventId , event);
 }}

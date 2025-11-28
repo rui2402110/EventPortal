@@ -177,16 +177,49 @@ public class HostEventDao extends Dao {
 	}
 	public boolean eventUpdate(String eventId , Event event) throws Exception {
 		// コネクションを確立
-				Connection connection = getConnection();
-				// プリペアードステートメント
-				PreparedStatement statement = null;
-				// Daoを定義
-				EventDao eventDao = new EventDao();
+		Connection connection = getConnection();
+		// プリペアードステートメント
+		PreparedStatement statement = null;
+		try {
+			// UPDATE文の作成
+            String sql = "UPDATE event SET " +
+            			  "event_name = ?, " +
+	                        "event_overview = ?, " +
+	                        "address = ?, " +
+	                        "map_out_of_hall = ?, " +
+	                        "map_in_hall = ?, " +
+	                        "holding_date = ?, " +
+	                        "holding_time = ?, " +
+	                        "link = ?, " +
+	                        "max_count = ?, " +
+	                        "phone_number = ?, " +
+	                        "event_hold_state = ? " +
+	                        "WHERE event_id = ?";
 
-				boolean result = false;
-				try {
-					statement = connection.prepareStatement("UPDATE events SET title = '新しいタイトル' WHERE event_id = 123;");
-					return true ;
+	            statement = connection.prepareStatement(sql);
+
+	            // パラメータをセット
+	            // AI賢い！！わざわざindexを何回も2とか3とかしなくていいようになってる
+	            int index = 1;
+		            statement.setString(index++, event.getEventName());           // event_name
+		            statement.setString(index++, event.getEventOverview());       // event_overview
+		            statement.setString(index++, event.getAddress());             // address
+		            statement.setString(index++, event.getMapOutOfHall());        // map_out_of_hall
+		            statement.setString(index++, event.getMapInHall());           // map_in_hall
+		            statement.setDate(index++, java.sql.Date.valueOf(event.getHoldingDate()));  // holding_date
+		            statement.setTime(index++, java.sql.Time.valueOf(event.getHoldingTime()));  // holding_time
+		            statement.setString(index++, event.getLink());                // link
+		            statement.setInt(index++, event.getMaxCount());               // max_count
+		            statement.setString(index++, event.getPhoneNumber());         // phone_number
+		            statement.setString(index++, event.getEventHoldState());      // event_hold_state
+		            statement.setString(index++, eventId);             // WHERE event_id
+
+		            // SQL実行
+		            int result = statement.executeUpdate();
+
+		            System.out.println("更新件数: " + result);
+
+		            return result > 0;
 				} catch (Exception e) {
 					throw e;
 				} finally {
