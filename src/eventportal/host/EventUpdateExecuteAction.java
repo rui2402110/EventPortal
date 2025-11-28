@@ -103,4 +103,5 @@ public class EventUpdateExecuteAction extends Action {
 
     // INSERT処理を実行
     boolean result = hosEvtDao.eventUpdate(eventId , event);
+
 }}
