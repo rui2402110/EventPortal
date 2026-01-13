@@ -12,6 +12,10 @@
 </head>
 <body>
 <div>
+    <div class="action-buttons">
+        <a href="${pageContext.request.contextPath}/eventportal/host/HostEventDetail.action?eventId=${param.eventId}" class="btn btn-secondary">イベント詳細に戻る</a>
+        <a href="${pageContext.request.contextPath}/eventportal/host/hostDetail/ProductCreate.action?eventId=${param.eventId}" class="btn btn-success">新規商品登録</a>
+    </div>
     <c:choose>
         <c:when test="${not empty proList}">
             <table class="product-table">
@@ -92,7 +96,7 @@
         </c:when>
         <c:otherwise>
             <div class="no-data">
-                登録されている商品がありません。<br />
+                登録されている商品がありません。<br/>
                 「新規商品登録」ボタンから商品を登録してください。
             </div>
         </c:otherwise>
