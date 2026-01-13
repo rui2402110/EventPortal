@@ -44,7 +44,7 @@
                             <td>${evt.maxCount}</td>
                             <td>${evt.eventHoldState}</td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/eventportal/host/HostEventDetail.action?eventId=${evt.eventId}">詳細</a> |
+                                <a href="${pageContext.request.contextPath}/eventportal/entrymenu/EntryEventDetail.action?eventId=${evt.eventId}">詳細</a> |
                                 <a href="EventDelete.action?eventId=${evt.eventId}" onclick="return confirm('本当に参加取消しますか?')">参加取消</a>
                             </td>
                         </tr>
