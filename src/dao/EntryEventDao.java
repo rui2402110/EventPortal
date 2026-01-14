@@ -111,4 +111,49 @@ public class EntryEventDao extends Dao {
 		return list;
 
 	}
+	// イベントIDを受け取り、画像のurlを取得するメソッド
+	public String urlGet(String eventId , int areaType) throws Exception{
+		// コネクションを確立
+		Connection connection = getConnection();
+		// プリペアードステートメント
+		PreparedStatement statement = null;
+		// 変数を定義
+		String url = null;
+		try{
+			//  areaTypeが1の場合は会場内マップのurlを、2の場合は会場外マップのurlを検索
+			if (areaType == 1){
+				statement = connection.prepareStatement("SELECT MAP_IN_HALL FROM EVENTS WHERE EVENT_ID=?;");
+			} else {
+				statement = connection.prepareStatement("SELECT MAP_OUT_OF_HALL FROM EVENTS WHERE EVENT_ID=?;");
+			}
+			statement.setString(1, eventId);
+			// SQL文の実行
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.next()){
+			    url = resultSet.getString(1);  // SELECT句の1番目のカラム
+			}
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			// プリペアードステートメントを閉じる
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+			// コネクションを閉じる
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+		}
+		return url;
+	}
+
 }

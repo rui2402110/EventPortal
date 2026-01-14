@@ -62,7 +62,7 @@
             </tbody>
           </table>
           <button>会場外マップ表示</button>
-          <button>会場内マップ表示</button>
+          <button  class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/entrydetail/EntryMapinHall.action?eventId=${evt.eventId}'">会場内マップ表示</button>
           <button  class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/hostdetail/HostProduct.action?eventId=${evt.eventId}'">グッズ・フード管理</button>
           <button>QRコード表示</button>
 
