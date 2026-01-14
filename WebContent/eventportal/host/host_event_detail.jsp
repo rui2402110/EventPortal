@@ -64,7 +64,9 @@
           <button>イベント開催</button>
           <button>イベント終了</button>
           <button  class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/hostdetail/HostProduct.action?eventId=${evt.eventId}'">グッズ・フード管理</button>
-          <button>QRコード読み取り</button>
+         <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/HostQRScanner.action?eventId=${evt.eventId}'">
+    QRコード読み取り
+</button>
 
     </div>
 
