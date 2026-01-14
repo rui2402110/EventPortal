@@ -11,6 +11,9 @@
 <body>
   <div class="container">
     <div class="header">イベントポータル</div>
+    <div class="user-info">
+    	<p>ログインユーザー: <strong>${sessionScope.user.user_id}</strong></p>
+	</div>
 
     <div class="content">
       <h2>参加者メニュー</h2>
