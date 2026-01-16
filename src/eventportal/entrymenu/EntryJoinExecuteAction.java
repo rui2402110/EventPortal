@@ -22,7 +22,7 @@ public class EntryJoinExecuteAction extends Action {
 
 
             // イベント参加登録
-            boolean result = dao.join(eventId , user.getUser_id());
+            boolean result = dao.join(user.getUser_id(),eventId);
 
             if (result == true) {
                 // 登録成功
