@@ -1,4 +1,4 @@
-package dao;
+spackage dao;
 
 
 public class ProductDao extends Dao {
