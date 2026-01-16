@@ -68,6 +68,7 @@
 
     </div>
 
+	<a href="${pageContext.request.contextPath}/eventportal/entrymenu/EntryEventManage.action">← 戻る</a>
     <div class="footer">@2025.................................................</div>
   </div>
 </body>

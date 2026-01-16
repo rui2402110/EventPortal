@@ -54,6 +54,7 @@
         </c:otherwise>
     </c:choose>
 
+	 <a href="${pageContext.request.contextPath}/eventportal/entrymenu/EntryMenu.action">← 戻る</a>
     <div class="footer">@2025.................................................</div>
   </div>
 </body>
