@@ -34,6 +34,7 @@ public class HostProductAction extends Action {
 
         	 req.setAttribute("proList", proList);
         	 req.getRequestDispatcher("../product_before.jsp").forward(req, res);
+        	 break;
         case "2":
         	System.out.println("開催中グッズフード処理開始");
             // 2のときの処理

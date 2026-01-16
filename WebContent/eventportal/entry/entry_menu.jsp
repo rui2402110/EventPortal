@@ -11,10 +11,13 @@
 <body>
   <div class="container">
     <div class="header">イベントポータル</div>
+    <div class="user-info">
+    	<p>ログインユーザー: <strong>${sessionScope.user.user_id}</strong></p>
+	</div>
 
     <div class="content">
       <h2>参加者メニュー</h2>
-      <button class="btn" onclick="location.href='eventlist_04.html'">参加者イベント管理</button>
+      <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/EntryEventManage.action'">参加者イベント管理</button>
       <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/EntryEventList.action'">イベント一覧</button>
     </div>
 

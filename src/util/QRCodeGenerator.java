@@ -1,146 +1,122 @@
 package util;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.cert.X509Certificate;
-import java.util.Base64;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 /**
- * QRコード生成ユーティリティ（SSL検証無効版・Java 8互換）
+ * QRコード生成ユーティリティクラス
+ * ZXingライブラリを使用した実装
  */
 public class QRCodeGenerator {
-    private static final String QR_API_URL = "https://api.qrserver.com/v1/create-qr-code/";
-    private static final int DEFAULT_SIZE = 300;
 
-    // SSL検証を無効化（開発環境のみ使用）
-    static {
-        disableSSLVerification();
+    private static final int DEFAULT_WIDTH = 300;
+    private static final int DEFAULT_HEIGHT = 300;
+
+    /**
+     * QRコード画像を生成してファイルに保存
+     * @param text QRコードに埋め込むテキスト
+     * @param filePath 保存先のファイルパス
+     * @return 生成成功時はtrue
+     */
+    public static boolean generateQRCode(String text, String filePath) {
+        return generateQRCode(text, filePath, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     /**
-     * SSL証明書検証を無効化（開発環境専用）
+     * QRコード画像を生成してファイルに保存（サイズ指定可能）
+     * @param text QRコードに埋め込むテキスト
+     * @param filePath 保存先のファイルパス
+     * @param width 画像の幅
+     * @param height 画像の高さ
+     * @return 生成成功時はtrue
      */
-    private static void disableSSLVerification() {
+    public static boolean generateQRCode(String text, String filePath, int width, int height) {
         try {
-            TrustManager[] trustAllCerts = new TrustManager[] {
-                new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() { return null; }
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) { }
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) { }
-                }
-            };
+            // ファイルの親ディレクトリが存在しない場合は作成
+            File outputFile = new File(filePath);
+            File parentDir = outputFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
 
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+            // QRコード生成のヒント設定
+            Map<EncodeHintType, Object> hints = new HashMap<>();
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+            hints.put(EncodeHintType.MARGIN, 2);
 
-            System.out.println("⚠️ SSL検証が無効化されました（開発環境のみ使用）");
+            // QRコードライターを作成
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
+            // テキストをQRコードに変換
+            BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height, hints);
+
+            // 画像ファイルとして保存
+            Path path = FileSystems.getDefault().getPath(filePath);
+            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+
+            System.out.println("QRコード生成成功: " + filePath);
+            return true;
+
+        } catch (WriterException e) {
+            System.err.println("QRコード生成エラー: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            System.err.println("ファイル書き込みエラー: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         } catch (Exception e) {
-            System.err.println("SSL検証無効化エラー: " + e.getMessage());
+            System.err.println("予期しないエラー: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
 
     /**
-     * QRコードをBase64形式で生成
+     * QRコードデータの検証
+     * @param data QRコードデータ
+     * @return 有効な場合はtrue
      */
-    public static String generateQRCodeBase64(String data) throws Exception {
-        return generateQRCodeBase64(data, DEFAULT_SIZE);
-    }
-
-    /**
-     * QRコードをBase64形式で生成（サイズ指定可能）
-     */
-    public static String generateQRCodeBase64(String data, int size) throws Exception {
-        String urlString = QR_API_URL + "?size=" + size + "x" + size + "&data=" +
-                          java.net.URLEncoder.encode(data, "UTF-8");
-
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(10000);
-        conn.setReadTimeout(10000);
-
-        try (InputStream in = conn.getInputStream();
-             ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-
-            byte[] dataBuffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, dataBuffer.length)) != -1) {
-                buffer.write(dataBuffer, 0, bytesRead);
-            }
-
-            byte[] imageBytes = buffer.toByteArray();
-            String base64 = Base64.getEncoder().encodeToString(imageBytes);
-            System.out.println("QRコード生成成功（Base64）: " + data);
-            return base64;
-        } finally {
-            conn.disconnect();
-        }
-    }
-
-    /**
-     * QRコードを画像ファイルとして保存
-     */
-    public static String generateTicketQRCode(String data, String outputPath) throws Exception {
-        return generateTicketQRCode(data, outputPath, DEFAULT_SIZE);
-    }
-
-    /**
-     * QRコードを画像ファイルとして保存（サイズ指定可能）
-     */
-    public static String generateTicketQRCode(String data, String outputPath, int size) throws Exception {
-        File directory = new File(outputPath);
-        if (!directory.exists()) {
-            directory.mkdirs();
+    public static boolean validateQRCodeData(String data) {
+        if (data == null || data.trim().isEmpty()) {
+            return false;
         }
 
-        String urlString = QR_API_URL + "?size=" + size + "x" + size + "&data=" +
-                          java.net.URLEncoder.encode(data, "UTF-8");
-
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(10000);
-        conn.setReadTimeout(10000);
-
-        String filename = data + ".png";
-        String filepath = outputPath + File.separator + filename;
-
-        try (BufferedInputStream in = new BufferedInputStream(conn.getInputStream());
-             FileOutputStream fileOutputStream = new FileOutputStream(filepath)) {
-
-            byte[] dataBuffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                fileOutputStream.write(dataBuffer, 0, bytesRead);
-            }
-
-            System.out.println("QRコード画像保存成功: " + filepath);
-        } finally {
-            conn.disconnect();
+        // データサイズの上限チェック（QRコードの容量制限）
+        if (data.length() > 2953) { // QRコード Version 40 の最大容量
+            return false;
         }
 
-        return filepath;
+        return true;
     }
 
     /**
-     * 保存されたQRコード画像をBase64形式で読み込み
+     * テスト用メインメソッド
      */
-    public static String imageToBase64(String imagePath) throws Exception {
-        byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
-        return Base64.getEncoder().encodeToString(imageBytes);
+    public static void main(String[] args) {
+        // テストデータ
+        String testData = "TEST-" + System.currentTimeMillis();
+        String outputPath = "./test_qrcode.png";
+
+        if (generateQRCode(testData, outputPath)) {
+            System.out.println("テストQRコード生成成功");
+            System.out.println("データ: " + testData);
+            System.out.println("ファイル: " + outputPath);
+        } else {
+            System.out.println("テストQRコード生成失敗");
+        }
     }
 }
