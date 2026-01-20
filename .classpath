@@ -15,6 +15,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/core-3.5.1-javadoc.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/gson-2.10.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/javase-3.5.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javase-3.5.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
