@@ -1,6 +1,7 @@
 package eventportal.host.order;
 
 import java.time.LocalDateTime;
+import java.util.List;  // ← この行を追加
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -130,7 +131,7 @@ public class OrderExecuteAction extends Action {
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("error", "エラーが発生しました: " + e.getMessage());
-            req.getRequestDispatcher("/eventportal/common/error.jsp").forward(req, res);
+            req.getRequestDispatcher("/error.jsp").forward(req, res);  // パスも修正
         }
     }
 }
