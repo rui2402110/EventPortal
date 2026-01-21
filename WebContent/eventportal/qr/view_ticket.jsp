@@ -3,231 +3,269 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>チケット詳細 - イベントポータル</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>入場チケット | イベントポータル</title>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/common/style.css">
+  <style>
+    .ticket-container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+    .ticket-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .ticket-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .ticket-id {
+      font-family: 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: bold;
+      color: #667eea;
+      margin-top: 15px;
+    }
+    .ticket-body {
+      padding: 30px;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
+    /* イベント名リンクのスタイル */
+    .event-name-link {
+      display: block;
+      padding: 15px;
+      margin: 20px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+    .event-name-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, #7c8ff0 0%, #8a5bb8 100%);
+    }
 
-        .header {
-            background-color: #4a5568;
-            color: white;
-            padding: 20px;
-            border-radius: 5px 5px 0 0;
-            text-align: center;
-        }
+    .event-name-link::after {
+      content: " →";
+      margin-left: 10px;
+    }
 
-        .header h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
-        }
+    .info-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .info-label {
+      flex: 0 0 120px;
+      font-weight: bold;
+      color: #555;
+    }
+    .info-value {
+      flex: 1;
+      color: #333;
+    }
+    .qr-section {
+      text-align: center;
+      padding: 30px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .qr-code {
+      width: 250px;
+      height: 250px;
+      margin: 0 auto;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .qr-code img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .action-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .btn-download {
+      background: #4CAF50;
+      color: white;
+    }
+    .btn-download:hover {
+      background: #45a049;
+    }
+    .btn-print {
+      background: #2196F3;
+      color: white;
+    }
+    .btn-print:hover {
+      background: #0b7dda;
+    }
+    .btn-back {
+      background: #757575;
+      color: white;
+    }
+    .btn-back:hover {
+      background: #616161;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-valid {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .status-used {
+      background: #ffebee;
+      color: #c62828;
+    }
 
-        .header .ticket-id {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+    /* レスポンシブ対応 */
+    @media (max-width: 600px) {
+      .event-name-link {
+        font-size: 16px;
+        padding: 12px;
+      }
 
-        .content {
-            padding: 30px;
-        }
+      .btn-group {
+        flex-direction: column;
+      }
 
-        .qr-container {
-            text-align: center;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border: 2px dashed #ddd;
-            border-radius: 5px;
-            margin-bottom: 30px;
-        }
-
-        .qr-container img {
-            max-width: 300px;
-            width: 100%;
-            height: auto;
-        }
-
-        .qr-note {
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            border-radius: 3px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .status-valid {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-used {
-            background-color: #e2e8f0;
-            color: #4a5568;
-            border: 1px solid #cbd5e0;
-        }
-
-        .status-invalid {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .info-section {
-            margin-bottom: 25px;
-        }
-
-        .info-label {
-            font-weight: bold;
-            color: #333;
-            font-size: 13px;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            color: #555;
-            font-size: 14px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 3px;
-        }
-
-        .btn-back {
-            display: inline-block;
-            width: 100%;
-            padding: 12px;
-            background-color: #e2e8f0;
-            color: #333;
-            text-decoration: none;
-            border-radius: 3px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 20px;
-        }
-
-        .btn-back:hover {
-            background-color: #cbd5e0;
-        }
-
-        .warning-message {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 12px;
-            border-radius: 3px;
-            margin-bottom: 20px;
-            font-size: 13px;
-        }
-    </style>
+      .action-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>チケット詳細</h1>
-            <p class="ticket-id">チケットID: ${ticket.ticketId}</p>
+  <div class="container">
+    <div class="header">イベントポータル - 入場チケット</div>
+    <div class="ticket-container">
+      <div class="ticket-header">
+        <h2>入場チケット</h2>
+        <div class="ticket-id">Ticket ID: ${ticket.ticketId}</div>
+      </div>
+      <div class="ticket-body">
+        <!-- イベント名リンク（追加） -->
+        <c:if test="${not empty event}">
+          <a href="${pageContext.request.contextPath}/eventportal/entrymenu/entrydetail/EntryQrDisp.action?eventId=${event.eventId}"
+             class="event-name-link">
+            ${event.eventName}
+          </a>
+        </c:if>
+
+        <div class="event-info">
+          <h3 style="margin-top: 0; color: #333;">イベント情報</h3>
+          <c:if test="${not empty event}">
+            <div class="info-row">
+              <div class="info-label">開催日時</div>
+              <div class="info-value">${event.holdingDate} ${event.holdingTime}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">会場</div>
+              <div class="info-value">${event.address}</div>
+            </div>
+          </c:if>
+          <div class="info-row">
+            <div class="info-label">参加者名</div>
+            <div class="info-value">${user.user_name}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">ステータス</div>
+            <div class="info-value">
+              <c:choose>
+                <c:when test="${ticket.status == 1}">
+                  <span class="status-badge status-valid">有効</span>
+                </c:when>
+                <c:when test="${ticket.status == 2}">
+                  <span class="status-badge status-used">使用済み</span>
+                </c:when>
+                <c:otherwise>
+                  <span class="status-badge">無効</span>
+                </c:otherwise>
+              </c:choose>
+            </div>
+          </div>
         </div>
-
-        <div class="content">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <c:choose>
-                    <c:when test="${ticket.status == 1}">
-                        <span class="status-badge status-valid">有効</span>
-                    </c:when>
-                    <c:when test="${ticket.status == 2}">
-                        <span class="status-badge status-used">使用済み</span>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="status-badge status-invalid">無効</span>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-
-            <c:if test="${ticket.status == 2}">
-                <div class="warning-message">
-                    このチケットは既に使用済みです。再度入場することはできません。
-                </div>
-            </c:if>
-
-            <c:if test="${ticket.status == 3}">
-                <div class="warning-message">
-                    このチケットは無効です。入場することはできません。
-                </div>
-            </c:if>
-
-            <div class="qr-container">
-                <c:choose>
-                    <c:when test="${not empty ticket.qrImageData}">
-                        <img src="data:image/png;base64,${ticket.qrImageData}" alt="QRコード">
-                        <p class="qr-note">入場時にこのQRコードをご提示ください</p>
-                    </c:when>
-                    <c:otherwise>
-                        <p style="color: #999;">QRコードが生成されていません</p>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-
-            <div class="info-section">
-                <div class="info-label">イベント名</div>
-                <div class="info-value">${ticket.event.eventName}</div>
-            </div>
-
-            <div class="info-section">
-                <div class="info-label">開催日時</div>
-                <div class="info-value">${ticket.event.holdDatetime}</div>
-            </div>
-
-            <div class="info-section">
-                <div class="info-label">開催場所</div>
-                <div class="info-value">${ticket.event.place}</div>
-            </div>
-
-            <c:if test="${not empty ticket.ticketInfo}">
-                <div class="info-section">
-                    <div class="info-label">チケット情報</div>
-                    <div class="info-value">${ticket.ticketInfo}</div>
-                </div>
-            </c:if>
-
-            <div class="info-section">
-                <div class="info-label">発行日時</div>
-                <div class="info-value">${ticket.createdAt}</div>
-            </div>
-
-            <c:if test="${not empty ticket.usedAt}">
-                <div class="info-section">
-                    <div class="info-label">使用日時</div>
-                    <div class="info-value">${ticket.usedAt}</div>
-                </div>
-            </c:if>
-
-            <a href="${pageContext.request.contextPath}/eventportal/entrymenu/MyTickets.action" class="btn-back">
-                チケット一覧に戻る
-            </a>
+        <div class="qr-section">
+          <h3 style="margin-top: 0; color: #333;">入場用QRコード</h3>
+          <div class="qr-code">
+            <c:choose>
+              <c:when test="${not empty ticket.qrImageData}">
+                <img src="data:image/png;base64,${ticket.qrImageData}"
+                     alt="入場用QRコード"
+                     id="qrCodeImage">
+              </c:when>
+              <c:when test="${not empty ticket.qrImagePath}">
+                <img src="${pageContext.request.contextPath}${ticket.qrImagePath}"
+                     alt="入場用QRコード"
+                     id="qrCodeImage">
+              </c:when>
+              <c:otherwise>
+                <p style="color: #999;">QRコードが生成されていません</p>
+              </c:otherwise>
+            </c:choose>
+          </div>
+          <p style="margin-top: 15px; color: #666; font-size: 14px;">
+            ※ 入場時にこのQRコードを提示してください<br>
+            ※ スクリーンショットでの提示も可能です
+          </p>
         </div>
+      </div>
     </div>
+    <div class="btn-group">
+      <button class="action-btn btn-download" onclick="downloadQRCode()">QRコードをダウンロード</button>
+      <button class="action-btn btn-print" onclick="window.print()">印刷</button>
+      <button class="action-btn btn-back" onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/MyTickets.action'">戻る</button>
+    </div>
+    <div class="footer">@2025.................................................</div>
+  </div>
+  <script>
+    function downloadQRCode() {
+      const img = document.getElementById('qrCodeImage');
+      if (!img) {
+        alert('QRコードが見つかりません');
+        return;
+      }
+
+      const link = document.createElement('a');
+      link.href = img.src;
+      link.download = 'ticket_qr_${ticket.ticketId}.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
 </body>
 </html>

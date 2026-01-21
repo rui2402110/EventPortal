@@ -1,6 +1,7 @@
 package eventportal.host;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,9 +16,6 @@ import dao.UserDaoEx;
 import tool.Action;
 import util.QRCodeGenerator;
 
-/**
- * チケット作成実行アクション
- */
 public class CreateTicketExecuteAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -34,8 +32,8 @@ public class CreateTicketExecuteAction extends Action {
             String userId = req.getParameter("userId");
             String ticketInfo = req.getParameter("ticketInfo");
 
-            if (eventId == null || eventId.isEmpty() ||
-                userId == null || userId.isEmpty()) {
+            // バリデーション
+            if (eventId == null || eventId.isEmpty() || userId == null || userId.isEmpty()) {
                 req.setAttribute("error", "イベントとユーザーを選択してください");
                 req.getRequestDispatcher("/eventportal/host/CreateTicket.action").forward(req, res);
                 return;
@@ -45,6 +43,7 @@ public class CreateTicketExecuteAction extends Action {
             TicketDao ticketDao = new TicketDao();
             UserDaoEx userDaoEx = new UserDaoEx();
 
+            // イベント確認
             Event event = eventDao.get(eventId);
             if (event == null) {
                 req.setAttribute("error", "イベントが見つかりません");
@@ -52,25 +51,22 @@ public class CreateTicketExecuteAction extends Action {
                 return;
             }
 
+            // 権限確認
             if (!event.getUserId().equals(user.getUser_id())) {
                 req.setAttribute("error", "このイベントにアクセスする権限がありません");
                 req.getRequestDispatcher("/eventportal/host/CreateTicket.action").forward(req, res);
                 return;
             }
 
+            // ユーザー確認
             User entryUser = userDaoEx.get(userId);
-            if (entryUser == null) {
-                req.setAttribute("error", "ユーザーが見つかりません");
+            if (entryUser == null || entryUser.getUser_type() != 1) {
+                req.setAttribute("error", "有効な参加者を選択してください");
                 req.getRequestDispatcher("/eventportal/host/CreateTicket.action").forward(req, res);
                 return;
             }
 
-            if (entryUser.getUser_type() != 1) {
-                req.setAttribute("error", "選択されたユーザーは参加者ではありません");
-                req.getRequestDispatcher("/eventportal/host/CreateTicket.action").forward(req, res);
-                return;
-            }
-
+            // 重複チェック
             Ticket existingTicket = ticketDao.getByEventAndUser(eventId, userId);
             if (existingTicket != null) {
                 req.setAttribute("error", "このユーザーは既にこのイベントのチケットを持っています");
@@ -79,33 +75,38 @@ public class CreateTicketExecuteAction extends Action {
                 return;
             }
 
+            // チケットIDを生成
             String ticketId = ticketDao.generateTicketId();
-            String qrImageData = QRCodeGenerator.generateQRCodeBase64(ticketId);
 
-            String qrImagePath = null;
-            try {
-                String outputPath = req.getServletContext().getRealPath("/qr");
-                if (outputPath != null) {
-                    qrImagePath = QRCodeGenerator.generateTicketQRCode(ticketId, outputPath);
-                }
-            } catch (Exception e) {
-                System.err.println("QRコード画像ファイル保存エラー（Base64は保存済み）: " + e.getMessage());
+            // QRコードを生成（Base64とファイルの両方）
+            String qrOutputDir = req.getServletContext().getRealPath("/qr");
+            Map<String, String> qrResult = QRCodeGenerator.generateTicketQRCodeComplete(ticketId, qrOutputDir);
+
+            if (qrResult == null) {
+                req.setAttribute("error", "QRコードの生成に失敗しました");
+                req.getRequestDispatcher("/eventportal/host/CreateTicket.action").forward(req, res);
+                return;
             }
 
+            // チケットオブジェクトを作成
             Ticket ticket = new Ticket();
             ticket.setTicketId(ticketId);
             ticket.setUserId(userId);
             ticket.setEventId(eventId);
-            ticket.setQrImagePath(qrImagePath);
-            ticket.setQrImageData(qrImageData);
-            ticket.setStatus(1);
+            ticket.setQrImagePath(qrResult.get("filePath")); // ファイルパス
+            ticket.setQrImageData(qrResult.get("base64"));   // Base64データ
+            ticket.setStatus(1); // 有効
             ticket.setTicketInfo(ticketInfo != null ? ticketInfo : "");
             ticket.setCreatedAt(LocalDateTime.now());
 
+            // データベースに保存
             boolean created = ticketDao.create(ticket);
 
             if (created) {
                 System.out.println("チケット作成成功: " + ticketId);
+                System.out.println("- QRファイルパス: " + qrResult.get("filePath"));
+                System.out.println("- QRBase64データ: " + (qrResult.get("base64") != null ? "あり" : "なし"));
+
                 session.setAttribute("successMessage",
                     "チケットを発行しました（チケットID: " + ticketId + "）");
                 res.sendRedirect(req.getContextPath() +
