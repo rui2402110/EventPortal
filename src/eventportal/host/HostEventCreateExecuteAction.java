@@ -100,7 +100,7 @@ public class HostEventCreateExecuteAction extends Action {
             event.setMapOutOfHall(mapImagePath);
             event.setMapInHall(innerMapImagePath);
             event.setEventAddDate(today);
-            event.setEventHoldState("1");
+            event.setEventHoldState("2");
             event.setHoldingDate(holdingDate);
             event.setHoldingTime(holdingTime);
             event.setLink(link);
