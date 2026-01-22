@@ -13,7 +13,6 @@ public class EventUpdateAction extends Action {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 	System.out.println("イベント更画面表示");
-    // 画面を表示するだけで、特別なロジックは不要
 	// jspから送られてきたデータを取得
 	String eventId = req.getParameter("eventId");
 	System.out.println(eventId);
