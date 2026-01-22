@@ -1,6 +1,5 @@
 package eventportal.entrymenu;
 
-import java.io.File;
 import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,51 +20,49 @@ public class EntryJoinExecuteAction extends Action {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
 
+        // ユーザーチェック
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/eventportal/auth/EntryLogin.action");
+            return;
+        }
+
         // パラメータ取得
         String eventId = req.getParameter("eventId");
 
-        // Dao生成
-        EntryEventDao dao = new EntryEventDao();
+        if (eventId == null || eventId.isEmpty()) {
+            req.setAttribute("errorMessage", "イベントIDが指定されていません");
+            req.getRequestDispatcher("entry_join.jsp").forward(req, res);
+            return;
+        }
+
+        // DAO生成
+        EntryEventDao entryDao = new EntryEventDao();
         TicketDao ticketDao = new TicketDao();
 
         try {
             // イベント参加登録
-            boolean result = dao.join(user.getUser_id(), eventId);
+            boolean result = entryDao.join(user.getUser_id(), eventId);
 
             if (result) {
-                // 登録成功
-                System.out.println("参加登録成功");
+                // 登録成功 - チケットを作成
+                System.out.println("参加登録成功 - チケット作成開始");
 
-                // チケットを作成
+                // チケットIDを生成
                 String ticketId = ticketDao.generateTicketId();
 
                 // QRコード画像をBase64形式で生成
                 String qrImageData = QRCodeGenerator.generateQRCodeBase64(ticketId);
 
-                // QRコード画像ファイルも作成
+                // QRコード画像ファイルも生成（オプション）
                 String qrImagePath = null;
                 try {
                     String outputPath = req.getServletContext().getRealPath("/qr");
                     if (outputPath != null) {
-                        // ディレクトリが存在しない場合は作成
-                        File qrDir = new File(outputPath);
-                        if (!qrDir.exists()) {
-                            qrDir.mkdirs();
-                            System.out.println("QRコード保存ディレクトリを作成: " + outputPath);
-                        }
-
-                        // QRコード画像を生成して保存
-                        String fileName = QRCodeGenerator.generateTicketQRCode(ticketId, outputPath);
-                        if (fileName != null) {
-                            qrImagePath = "/qr/" + fileName;
-                            System.out.println("QRコード画像保存成功: " + qrImagePath);
-                        }
-                    } else {
-                        System.err.println("QRコード保存パスが取得できませんでした");
+                        qrImagePath = QRCodeGenerator.generateTicketQRCode(ticketId, outputPath);
+                        System.out.println("QRコード画像ファイル作成: " + qrImagePath);
                     }
                 } catch (Exception e) {
-                    System.err.println("QRコード画像ファイル保存エラー: " + e.getMessage());
-                    e.printStackTrace();
+                    System.err.println("QRコード画像ファイル保存エラー（Base64は保存済み）: " + e.getMessage());
                 }
 
                 // チケット情報を設定
@@ -75,8 +72,7 @@ public class EntryJoinExecuteAction extends Action {
                 ticket.setEventId(eventId);
                 ticket.setQrImagePath(qrImagePath);
                 ticket.setQrImageData(qrImageData);
-                ticket.setStatus(1); // 有効
-                ticket.setTicketInfo("");
+                ticket.setStatus(1); // 1: 有効
                 ticket.setCreatedAt(LocalDateTime.now());
 
                 // チケットをDBに保存
@@ -84,19 +80,17 @@ public class EntryJoinExecuteAction extends Action {
 
                 if (ticketCreated) {
                     System.out.println("チケット作成成功: " + ticketId);
-
-                    // QRコード表示画面へリダイレクト
-                    res.sendRedirect(req.getContextPath() +
-                        "/eventportal/entrymenu/entrydetail/EntryQrDisp.action?eventId=" + eventId);
+                    req.setAttribute("successMessage", "イベントへの参加登録が完了しました");
+                    res.sendRedirect(req.getContextPath() + "/eventportal/entrymenu/MyTickets.action");
                 } else {
                     System.err.println("チケット作成失敗");
-                    req.setAttribute("errorMessage", "チケット作成に失敗しました");
+                    req.setAttribute("errorMessage", "チケットの作成に失敗しました");
                     req.getRequestDispatcher("entry_join.jsp").forward(req, res);
                 }
             } else {
                 // 登録失敗
-                System.out.println("参加登録失敗");
-                req.setAttribute("errorMessage", "参加登録に失敗しました");
+                System.out.println("参加登録失敗（既に参加済みの可能性あり）");
+                req.setAttribute("errorMessage", "参加登録に失敗しました（既に参加済みの可能性があります）");
                 req.getRequestDispatcher("entry_join.jsp").forward(req, res);
             }
         } catch (Exception e) {
