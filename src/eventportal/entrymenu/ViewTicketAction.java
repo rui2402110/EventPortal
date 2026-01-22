@@ -49,13 +49,18 @@ public class ViewTicketAction extends Action {
             return;
         }
 
+        // イベント情報を取得
         Event event = eventDao.get(ticket.getEventId());
         ticket.setEvent(event);
 
         System.out.println("チケット詳細表示: チケットID=" + ticketId +
                          ", QRデータ=" + (ticket.getQrImageData() != null ? "あり" : "なし"));
 
+        // リクエストに設定
         req.setAttribute("ticket", ticket);
+        req.setAttribute("event", event);  // イベント情報を追加
+        req.setAttribute("user", user);    // ユーザー情報を追加
+
         req.getRequestDispatcher("/eventportal/qr/view_ticket.jsp").forward(req, res);
     }
 }
