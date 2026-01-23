@@ -1,8 +1,5 @@
 package eventportal.auth;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,6 +30,26 @@ public class EntrySigninExecuteAction extends Action {
         mail_address = req.getParameter("mail_address");
         phone_number = req.getParameter("phone_number");
 
+        // 入力チェック：必須項目が空の場合
+        if (id == null || id.trim().isEmpty() ||
+            user_name == null || user_name.trim().isEmpty() ||
+            password == null || password.trim().isEmpty() ||
+            mail_address == null || mail_address.trim().isEmpty() ||
+            phone_number == null || phone_number.trim().isEmpty()) {
+
+            // エラー1: 入力されていません
+            req.setAttribute("error1", true);
+            req.setAttribute("id", id);
+            req.setAttribute("user_name", user_name);
+            req.setAttribute("mail_address", mail_address);
+            req.setAttribute("phone_number", phone_number);
+
+            //フォワード
+            url = "/eventportal/auth/entry_signin.jsp";
+            req.getRequestDispatcher(url).forward(req, res);
+            return;
+        }
+
         // userデータを検索し、取得(参加者のみなので引数に1を選択)
         user = userDao.signin(id, user_name, mail_address, password, phone_number, 1);
 
@@ -49,12 +66,12 @@ public class EntrySigninExecuteAction extends Action {
 
         } else {
             // 認証失敗の場合
-            // エラーメッセージをセット
-            List<String> errors = new ArrayList<>();
-            errors.add("登録に失敗しました。IDが既に使用されている可能性があります");
-            req.setAttribute("errors", errors);
-            // 入力されたユーザーIDをセット
-            req.setAttribute("user_id", id);
+            // エラー2: IDかパスワードが間違っています
+            req.setAttribute("error2", true);
+            req.setAttribute("id", id);
+            req.setAttribute("user_name", user_name);
+            req.setAttribute("mail_address", mail_address);
+            req.setAttribute("phone_number", phone_number);
 
             //フォワード
             url = "/eventportal/auth/entry_signin.jsp";
