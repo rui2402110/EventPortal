@@ -36,8 +36,6 @@
     .ticket-body {
       padding: 30px;
     }
-
-    /* イベント名リンクのスタイル */
     .event-name-link {
       display: block;
       padding: 15px;
@@ -52,18 +50,10 @@
       transition: all 0.3s;
       box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
-
     .event-name-link:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
-      background: linear-gradient(135deg, #7c8ff0 0%, #8a5bb8 100%);
     }
-
-    .event-name-link::after {
-      content: " →";
-      margin-left: 10px;
-    }
-
     .info-row {
       display: flex;
       padding: 12px 0;
@@ -86,54 +76,21 @@
       margin: 20px 0;
     }
     .qr-code {
-      width: 250px;
-      height: 250px;
+      width: 300px;
+      height: 300px;
       margin: 0 auto;
       background: white;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .qr-code img {
       width: 100%;
       height: 100%;
-      display: block;
-    }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .action-btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      transition: all 0.3s;
-    }
-    .btn-download {
-      background: #4CAF50;
-      color: white;
-    }
-    .btn-download:hover {
-      background: #45a049;
-    }
-    .btn-print {
-      background: #2196F3;
-      color: white;
-    }
-    .btn-print:hover {
-      background: #0b7dda;
-    }
-    .btn-back {
-      background: #757575;
-      color: white;
-    }
-    .btn-back:hover {
-      background: #616161;
+      object-fit: contain;
     }
     .status-badge {
       display: inline-block;
@@ -150,21 +107,40 @@
       background: #ffebee;
       color: #c62828;
     }
-
-    /* レスポンシブ対応 */
-    @media (max-width: 600px) {
-      .event-name-link {
-        font-size: 16px;
-        padding: 12px;
-      }
-
-      .btn-group {
-        flex-direction: column;
-      }
-
-      .action-btn {
-        width: 100%;
-      }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-download {
+      background: #4CAF50;
+      color: white;
+    }
+    .btn-print {
+      background: #2196F3;
+      color: white;
+    }
+    .btn-back {
+      background: #757575;
+      color: white;
+    }
+    .btn-shop {
+      background: #FF9800;
+      color: white;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -177,7 +153,6 @@
         <div class="ticket-id">Ticket ID: ${ticket.ticketId}</div>
       </div>
       <div class="ticket-body">
-        <!-- イベント名リンク（追加） -->
         <c:if test="${not empty event}">
           <a href="${pageContext.request.contextPath}/eventportal/entrymenu/entrydetail/EntryQrDisp.action?eventId=${event.eventId}"
              class="event-name-link">
@@ -209,7 +184,7 @@
                   <span class="status-badge status-valid">有効</span>
                 </c:when>
                 <c:when test="${ticket.status == 2}">
-                  <span class="status-badge status-used">使用済み</span>
+                  <span class="status-badge status-used">入場済み</span>
                 </c:when>
                 <c:otherwise>
                   <span class="status-badge">無効</span>
@@ -218,6 +193,7 @@
             </div>
           </div>
         </div>
+
         <div class="qr-section">
           <h3 style="margin-top: 0; color: #333;">入場用QRコード</h3>
           <div class="qr-code">
@@ -239,16 +215,31 @@
           </div>
           <p style="margin-top: 15px; color: #666; font-size: 14px;">
             ※ 入場時にこのQRコードを提示してください<br>
-            ※ スクリーンショットでの提示も可能です
+            ※ 入場後は会場内でグッズ・フードを注文できます
           </p>
         </div>
+
+        <c:if test="${ticket.status == 2}">
+          <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h4 style="margin: 0 0 10px 0; color: #2e7d32;">✓ 入場済み</h4>
+            <p style="margin: 0; color: #555;">会場内でグッズ・フードをご注文いただけます</p>
+          </div>
+        </c:if>
       </div>
     </div>
+
     <div class="btn-group">
+      <c:if test="${ticket.status == 2}">
+        <a href="${pageContext.request.contextPath}/eventportal/entry/order/EntryProductList.action?eventId=${event.eventId}&ticketId=${ticket.ticketId}"
+           class="action-btn btn-shop">
+          グッズ・フードを注文
+        </a>
+      </c:if>
       <button class="action-btn btn-download" onclick="downloadQRCode()">QRコードをダウンロード</button>
       <button class="action-btn btn-print" onclick="window.print()">印刷</button>
       <button class="action-btn btn-back" onclick="location.href='${pageContext.request.contextPath}/eventportal/entrymenu/MyTickets.action'">戻る</button>
     </div>
+
     <div class="footer">@2025.................................................</div>
   </div>
   <script>
@@ -258,7 +249,6 @@
         alert('QRコードが見つかりません');
         return;
       }
-
       const link = document.createElement('a');
       link.href = img.src;
       link.download = 'ticket_qr_${ticket.ticketId}.png';
