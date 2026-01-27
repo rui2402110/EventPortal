@@ -241,4 +241,57 @@ public class HostEventDao extends Dao {
 					}
 				}
 			}
-	}
+
+	// イベントを開催するか終了するメソッド
+public boolean incrementEventHoldState(String eventId) throws Exception {
+    // コネクションを確立
+    Connection connection = getConnection();
+    // プリペアードステートメント
+    PreparedStatement statement = null;
+
+    try {
+    	// THEN句でevent_hold_stateが1(開催前)の時は2(開催中)、2の時は3(開催後)にupdate
+        String sql = "UPDATE events SET " +
+                     "event_hold_state = CASE " +
+                     "  WHEN event_hold_state = '1' THEN '2' " +
+                     "  WHEN event_hold_state = '2' THEN '3' " +
+                     "  ELSE event_hold_state END " +
+                     "WHERE event_id = ? AND event_hold_state IN ('1', '2')";
+
+        statement = connection.prepareStatement(sql);
+
+        // パラメータをセット
+        int index = 1;
+        statement.setString(index++, eventId); // WHERE event_id
+
+        // SQL実行
+        int result = statement.executeUpdate();
+
+        System.out.println("ステータス更新件数: " + result);
+
+        // 更新されたらtrue、条件に合わず更新されなかったらfalse
+        return result > 0;
+
+    }catch (Exception e) {
+			throw e;
+		} finally {
+			// プリペアードステートメントを閉じる
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+			// コネクションを閉じる
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException sqle) {
+					throw sqle;
+				}
+			}
+		}
+}
+}
+

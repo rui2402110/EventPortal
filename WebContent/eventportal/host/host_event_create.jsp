@@ -99,6 +99,10 @@
 }
   </style>
 </head>
+    <div class="header">イベントポータル</div>
+    <div class="user-info">
+        <p>ログインユーザー: <strong>${sessionScope.user.user_id}</strong></p>
+    </div>
 <div class="container">
     <h1>イベント入力フォーム</h1>
 

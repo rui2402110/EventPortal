@@ -61,10 +61,10 @@
               </tr>
             </tbody>
           </table>
-          <button>イベント開催</button>
-          <button>イベント終了</button>
-          <button  class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/hostdetail/HostProduct.action?eventId=${evt.eventId}'">グッズ・フード管理</button>
-         <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/HostQRScanner.action?eventId=${evt.eventId}'">
+          <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/hostdetail/EventHold.action?eventId=${evt.eventId}&event_hold_state=${evt.eventHoldState}'">イベント開催</button>
+          <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/hostdetail/EventEnd.action?eventId=${evt.eventId}&event_hold_state=${evt.eventHoldState}'">イベント終了</button>
+          <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/hostdetail/HostProduct.action?eventId=${evt.eventId}'">グッズ・フード管理</button>
+          <button class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/host/HostQRScanner.action?eventId=${evt.eventId}'">
     QRコード読み取り
 </button>
 

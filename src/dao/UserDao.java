@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import bean.User;
 
 public class UserDao extends Dao {
+
+	// idとユーザー種別からユーザーを取得するメソッド
 	public User get(String id,int user_type) throws Exception {
 		// Userクラスを再定義
 		User user = new User();
@@ -59,6 +61,8 @@ public class UserDao extends Dao {
 		return user;
 
 	}
+
+	// ログインメソッド
 	public User login(String id, String password, int user_type) throws Exception {
 		// ユーザーインスタンスにgetメソッドで取得したデータを入れる
 		User user = get(id,user_type);
@@ -69,6 +73,7 @@ public class UserDao extends Dao {
 		return user;
 	}
 
+	// サインインメソッド
 	public User signin(String id, String user_name, String mail_address,
             String password, String phone_number, int user_type) throws Exception {
 Connection connection = getConnection();

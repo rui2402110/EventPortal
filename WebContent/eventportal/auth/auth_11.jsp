@@ -18,7 +18,7 @@
                 <button type="submit" class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/EntryLogin.action'">参加者としてログイン</button>
                 <button type="submit" class="btn" onclick="location.href='${pageContext.request.contextPath}/eventportal/auth/HostLogin.action'">主催者としてログイン</button>
             <div class="back">
-                <a href="${pageContext.request.contextPath}/eventportal/AuthPage.action">← 戻る</a>
+                <a href="${pageContext.request.contextPath}/eventportal/auth/AuthPage.action">← 戻る</a>
             </div>
 
         </div>

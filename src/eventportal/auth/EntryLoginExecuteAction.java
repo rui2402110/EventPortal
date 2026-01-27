@@ -1,8 +1,5 @@
 package eventportal.auth;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -28,6 +25,18 @@ public class EntryLoginExecuteAction extends Action {
 		id = req.getParameter("id");// 参加者ID
 		password = req.getParameter("password");//パスワード
 
+		// 入力チェック：IDまたはパスワードが空の場合
+		if (id == null || id.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+			// エラー1: 入力されていません
+			req.setAttribute("error1", true);
+			req.setAttribute("id", id);
+
+			//フォワード
+			url = "/eventportal/auth/auth_02.jsp";
+			req.getRequestDispatcher(url).forward(req, res);
+			return;
+		}
+
 		//userデータを検索し、取得(参加者のみなので引数に1を選択)
 		user = UserDao.login(id, password, 1);
 
@@ -46,19 +55,13 @@ public class EntryLoginExecuteAction extends Action {
 
 		} else {
 			// 認証失敗の場合
-			// エラーメッセージをセット
-			List<String> errors = new ArrayList<>();
-			errors.add("IDまたはパスワードが確認できませんでした");
-			req.setAttribute("errors", errors);
-			// 入力されたユーザーIDをセット
-			req.setAttribute("user_id", id);
+			// エラー2: IDかパスワードが間違っています
+			req.setAttribute("error2", true);
+			req.setAttribute("id", id);
 
 			//フォワード
 			url = "/eventportal/auth/auth_02.jsp";
 			req.getRequestDispatcher(url).forward(req, res);
 		}
-
-
 	}
-
 }
