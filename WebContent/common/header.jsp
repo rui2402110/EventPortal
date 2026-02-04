@@ -72,10 +72,9 @@
       cursor: default;
     }
 </style>
- <link rel="Stylesheet" href="${pageContext.request.contextPath}/style.css" />
-<c:if test="${user.isAuthenticated()}">
+<c:if test="${user != null && user.isAuth()}">
 	<div class="nav align-self-end">
-		<span class="nav-item px-2">${user.getName()}様</span>
-		<a class="nav-item px-2" href="Logout.action">ログアウト</a>
+		<span class="nav-item px-2">${user.user_name}様</span>
+		<a class="nav-item px-2" href="${pageContext.request.contextPath}/eventportal/auth/Logout.action">ログアウト</a>
 	</div>
 </c:if>

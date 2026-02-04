@@ -5,13 +5,324 @@
 
 <struts-config>
     <action-mappings>
-        <!-- 既存のアクションマッピング -->
 
-        <!-- ここに追加 ↓ -->
+        <!-- ==================== 認証関連 ==================== -->
+        <!-- トップページ -->
+        <action path="/eventportal/auth/AuthPage"
+                type="eventportal.auth.AuthPageAction">
+            <forward name="success" path="/eventportal/auth/auth_01.jsp"/>
+        </action>
+
+        <!-- ログイン区分選択ページ -->
+        <action path="/eventportal/auth/LoginPage"
+                type="eventportal.auth.LoginPageAction">
+            <forward name="success" path="/eventportal/auth/auth_11.jsp"/>
+        </action>
+
+        <!-- 参加者ログインページ -->
+        <action path="/eventportal/auth/EntryLogin"
+                type="eventportal.auth.EntryLoginAction">
+            <forward name="success" path="/eventportal/auth/auth_02.jsp"/>
+        </action>
+
+        <!-- 主催者ログインページ -->
+        <action path="/eventportal/auth/HostLogin"
+                type="eventportal.auth.HostLoginAction">
+            <forward name="success" path="/eventportal/auth/auth_03.jsp"/>
+        </action>
+
+        <!-- 参加者ログイン実行 -->
+        <action path="/eventportal/auth/EntryLoginExecute"
+                type="eventportal.auth.EntryLoginExecuteAction">
+            <forward name="success" path="/eventportal/entrymenu/EntryMenu.action"/>
+            <forward name="error" path="/eventportal/auth/auth_02.jsp"/>
+        </action>
+
+        <!-- 主催者ログイン実行 -->
+        <action path="/eventportal/auth/HostLoginExecute"
+                type="eventportal.auth.HostLoginExecuteAction">
+            <forward name="success" path="/eventportal/host/HostMenu.action"/>
+            <forward name="error" path="/eventportal/auth/auth_03.jsp"/>
+        </action>
+
+        <!-- サインイン区分選択ページ -->
+        <action path="/eventportal/auth/SigninPage"
+                type="eventportal.auth.SigninPageAction">
+            <forward name="success" path="/eventportal/auth/auth_08.jsp"/>
+        </action>
+
+        <!-- 参加者サインインページ -->
+        <action path="/eventportal/auth/EntrySignin"
+                type="eventportal.auth.EntrySigninAction">
+            <forward name="success" path="/eventportal/auth/entry_signin.jsp"/>
+        </action>
+
+        <!-- 主催者サインインページ -->
+        <action path="/eventportal/auth/HostSignin"
+                type="eventportal.auth.HostSigninAction">
+            <forward name="success" path="/eventportal/auth/host_signin.jsp"/>
+        </action>
+
+        <!-- 参加者サインイン実行 -->
+        <action path="/eventportal/auth/EntrySigninExecute"
+                type="eventportal.auth.EntrySigninExecuteAction">
+            <forward name="success" path="/eventportal/auth/EntryLogin.action"/>
+            <forward name="error" path="/eventportal/auth/entry_signin.jsp"/>
+        </action>
+
+        <!-- 主催者サインイン実行 -->
+        <action path="/eventportal/auth/HostSigninExecute"
+                type="eventportal.auth.HostSigninExecuteAction">
+            <forward name="success" path="/eventportal/auth/HostLogin.action"/>
+            <forward name="error" path="/eventportal/auth/host_signin.jsp"/>
+        </action>
+
+        <!-- ログアウト -->
+        <action path="/eventportal/auth/Logout"
+                type="eventportal.auth.LogoutAction">
+            <forward name="success" path="/eventportal/auth/AuthPage.action"/>
+        </action>
+
+        <!-- ==================== 参加者機能 ==================== -->
+        <!-- 参加者メニュー -->
+        <action path="/eventportal/entrymenu/EntryMenu"
+                type="eventportal.entry.EntryMenuAction">
+            <forward name="success" path="/eventportal/entry/entry_menu.jsp"/>
+        </action>
+
+        <!-- イベント一覧 -->
+        <action path="/eventportal/entrymenu/EntryEventList"
+                type="eventportal.entry.EntryEventListAction">
+            <forward name="success" path="/eventportal/entry/entry_event_list.jsp"/>
+        </action>
+
+        <!-- 参加イベント管理 -->
+        <action path="/eventportal/entrymenu/EntryEventManage"
+                type="eventportal.entry.EntryEventManageAction">
+            <forward name="success" path="/eventportal/entry/entry_event_manage.jsp"/>
+        </action>
+
+        <!-- イベント詳細 -->
+        <action path="/eventportal/entrymenu/EntryEventDetail"
+                type="eventportal.entry.EntryEventDetailAction">
+            <forward name="success" path="/eventportal/entry/entry_event_detail.jsp"/>
+        </action>
+
+        <!-- イベント参加ページ -->
+        <action path="/eventportal/entrymenu/EntryJoin"
+                type="eventportal.entry.EntryJoinAction">
+            <forward name="success" path="/eventportal/entry/enty_join.jsp"/>
+        </action>
+
+        <!-- イベント参加実行 -->
+        <action path="/eventportal/entrymenu/EntryJoinExecute"
+                type="eventportal.entry.EntryJoinExecuteAction">
+            <forward name="success" path="/eventportal/entrymenu/EntryEventManage.action"/>
+            <forward name="error" path="/eventportal/entry/enty_join.jsp"/>
+        </action>
+
+        <!-- イベント参加キャンセル -->
+        <action path="/eventportal/entrymenu/EntryEventCanccel"
+                type="eventportal.entry.EntryEventCanccelAction">
+            <forward name="success" path="/eventportal/entrymenu/EntryEventManage.action"/>
+        </action>
+
+        <!-- 会場外マップ表示 -->
+        <action path="/eventportal/entrymenu/entrydetail/EntryMapoutHall"
+                type="eventportal.entry.EntryMapoutHallAction">
+            <forward name="success" path="/eventportal/entry/entry_detail/entry_mapouthall.jsp"/>
+        </action>
+
+        <!-- 会場内マップ表示 -->
+        <action path="/eventportal/entrymenu/entrydetail/EntryMapinHall"
+                type="eventportal.entry.EntryMapinHallAction">
+            <forward name="success" path="/eventportal/entry/entry_detail/entry_mapinhall.jsp"/>
+        </action>
+
+        <!-- QRコード表示 -->
+        <action path="/eventportal/entrymenu/entrydetail/EntryQrDisp"
+                type="eventportal.entry.EntryQrDispAction">
+            <forward name="success" path="/eventportal/qr/entry_qrcode_view.jsp"/>
+        </action>
+
+        <!-- マイチケット -->
+        <action path="/eventportal/entrymenu/MyTickets"
+                type="eventportal.entry.MyTicketsAction">
+            <forward name="success" path="/eventportal/qr/my_tickets.jsp"/>
+        </action>
+
+        <!-- チケット表示 -->
+        <action path="/eventportal/entrymenu/ViewTicket"
+                type="eventportal.entry.ViewTicketAction">
+            <forward name="success" path="/eventportal/qr/view_ticket.jsp"/>
+        </action>
+
+        <!-- ==================== 商品購入（参加者） ==================== -->
+        <!-- 商品一覧 -->
+        <action path="/eventportal/entry/order/EntryProductList"
+                type="eventportal.entry.order.EntryProductListAction">
+            <forward name="success" path="/eventportal/entry/order/entry_product_list.jsp"/>
+            <forward name="not_admitted" path="/eventportal/entry/order/not_admitted.jsp"/>
+        </action>
+
+        <!-- カートに追加 -->
+        <action path="/eventportal/entry/order/AddToCart"
+                type="eventportal.entry.order.AddToCartAction">
+            <forward name="success" path="/eventportal/entry/order/EntryProductList.action"/>
+        </action>
+
+        <!-- 注文実行 -->
+        <action path="/eventportal/entry/order/OrderExecute"
+                type="eventportal.entry.order.OrderExecuteAction">
+            <forward name="success" path="/eventportal/entry/order/order_complete.jsp"/>
+            <forward name="error" path="/eventportal/entry/order/EntryProductList.action"/>
+        </action>
+
+        <!-- ==================== 主催者機能 ==================== -->
+        <!-- 主催者メニュー -->
+        <action path="/eventportal/host/HostMenu"
+                type="eventportal.host.HostMenuAction">
+            <forward name="success" path="/eventportal/host/host_menu.jsp"/>
+        </action>
+
+        <action path="/eventportal/host/HostMain"
+                type="eventportal.host.HostMainAction">
+            <forward name="success" path="/eventportal/host/host_menu.jsp"/>
+        </action>
+
+        <!-- イベント作成ページ -->
+        <action path="/eventportal/host/HostEventCreate"
+                type="eventportal.host.HostEventCreateAction">
+            <forward name="success" path="/eventportal/host/host_event_create.jsp"/>
+        </action>
+
+        <!-- イベント作成実行 -->
+        <action path="/eventportal/host/HostEventCreateExecute"
+                type="eventportal.host.HostEventCreateExecuteAction">
+            <forward name="success" path="/eventportal/host/event_create_done.jsp"/>
+            <forward name="error" path="/eventportal/host/host_event_create.jsp"/>
+        </action>
+
+        <!-- イベント詳細 -->
+        <action path="/eventportal/host/HostEventDetail"
+                type="eventportal.host.HostEventDetailAction">
+            <forward name="success" path="/eventportal/host/host_event_detail.jsp"/>
+        </action>
+
+        <!-- イベント編集ページ -->
+        <action path="/eventportal/host/EventUpdate"
+                type="eventportal.host.EventUpdateAction">
+            <forward name="success" path="/eventportal/host/host_event_update.jsp"/>
+        </action>
+
+        <!-- イベント編集実行 -->
+        <action path="/eventportal/host/HostEventUpdateExecute"
+                type="eventportal.host.HostEventUpdateExecuteAction">
+            <forward name="success" path="/eventportal/host/HostEventDetail.action"/>
+            <forward name="error" path="/eventportal/host/host_event_update.jsp"/>
+        </action>
+
+        <!-- イベント開催確認ページ -->
+        <action path="/eventportal/host/hostdetail/EventHold"
+                type="eventportal.host.EventHoldAction">
+            <forward name="success" path="/eventportal/host/event_hold.jsp"/>
+        </action>
+
+        <!-- イベント開催実行 -->
+        <action path="/eventportal/host/hostdetail/EventHoldExecute"
+                type="eventportal.host.EventHoldExecuteAction">
+            <forward name="success" path="/eventportal/host/event_hold_done.jsp"/>
+        </action>
+
+        <!-- イベント終了確認ページ -->
+        <action path="/eventportal/host/hostdetail/EventEnd"
+                type="eventportal.host.EventEndAction">
+            <forward name="success" path="/eventportal/host/event_end.jsp"/>
+        </action>
+
+        <!-- イベント終了実行 -->
+        <action path="/eventportal/host/hostdetail/EventEndExecute"
+                type="eventportal.host.EventEndExecuteAction">
+            <forward name="success" path="/eventportal/host/HostEventDetail.action"/>
+        </action>
+
+        <!-- ==================== 商品管理（主催者） ==================== -->
+        <!-- 商品一覧 -->
+        <action path="/eventportal/host/hostdetail/HostProduct"
+                type="eventportal.host.HostProductAction">
+            <forward name="success" path="/eventportal/host/product_before.jsp"/>
+        </action>
+
+        <!-- 商品作成ページ -->
+        <action path="/eventportal/host/hostDetail/ProductCreate"
+                type="eventportal.host.ProductCreateAction">
+            <forward name="success" path="/eventportal/host/host_product_create.jsp"/>
+        </action>
+
+        <!-- 商品編集ページ -->
+        <action path="/eventportal/host/hostDetail/ProductEdit"
+                type="eventportal.host.ProductEditAction">
+            <forward name="success" path="/eventportal/host/host_product_edit.jsp"/>
+        </action>
+
+        <!-- 商品削除 -->
+        <action path="/eventportal/host/hostDetail/ProductDelete"
+                type="eventportal.host.ProductDeleteAction">
+            <forward name="success" path="/eventportal/host/hostdetail/HostProduct.action"/>
+        </action>
+
+        <!-- ==================== チケット管理 ==================== -->
+        <!-- チケット作成ページ -->
+        <action path="/eventportal/host/CreateTicket"
+                type="eventportal.host.CreateTicketAction">
+            <forward name="success" path="/eventportal/host/host_create_ticket.jsp"/>
+        </action>
+
+        <!-- チケット作成実行 -->
+        <action path="/eventportal/host/CreateTicketExecute"
+                type="eventportal.host.CreateTicketExecuteAction">
+            <forward name="success" path="/eventportal/host/host_ticket_list.jsp"/>
+            <forward name="error" path="/eventportal/host/host_create_ticket.jsp"/>
+        </action>
+
+        <!-- チケット一覧 -->
+        <action path="/eventportal/host/TicketList"
+                type="eventportal.host.TicketListAction">
+            <forward name="success" path="/eventportal/host/host_ticket_list.jsp"/>
+        </action>
+
+        <!-- ==================== QRコード関連 ==================== -->
+        <!-- QRコードスキャナー -->
+        <action path="/eventportal/host/HostQRScanner"
+                type="eventportal.host.HostQRScannerAction">
+            <forward name="success" path="/eventportal/qr/host_qr_scanner.jsp"/>
+        </action>
+
+        <!-- チケット検証 -->
+        <action path="/eventportal/host/VerifyTicket"
+                type="eventportal.host.VerifyTicketAction">
+            <forward name="success" path="/eventportal/host/ticket_verified.jsp"/>
+            <forward name="error" path="/eventportal/host/ticket_error.jsp"/>
+        </action>
+
+        <!-- QRコード表示（既存） -->
         <action path="/entrymenu/ShowQRCode"
                 type="eventportal.entrymenu.ShowQRCodeAction">
             <forward name="success" path="/eventportal/qr/showQRCode.jsp"/>
             <forward name="error" path="/error.jsp"/>
+        </action>
+
+        <!-- ==================== 注文管理（主催者） ==================== -->
+        <!-- 注文一覧 -->
+        <action path="/eventportal/host/order/OrderList"
+                type="eventportal.host.order.OrderListAction">
+            <forward name="success" path="/eventportal/entry/order/host_order_list.jsp"/>
+        </action>
+
+        <!-- 注文ステータス更新 -->
+        <action path="/eventportal/host/order/UpdateOrderStatus"
+                type="eventportal.host.order.UpdateOrderStatusAction">
+            <forward name="success" path="/eventportal/host/order/OrderList.action"/>
         </action>
 
     </action-mappings>

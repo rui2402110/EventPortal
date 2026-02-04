@@ -17,6 +17,7 @@ public class User implements Serializable {
 	private int user_type;
 	// 認証フラグ
 	private boolean isAuth;
+
 	// ゲッター・セッター
 	public String getUser_id() {
 		return user_id;
@@ -61,4 +62,21 @@ public class User implements Serializable {
 		this.isAuth = isAuth;
 	}
 
+	// ========================================
+	// header.jsp互換メソッド
+	// ========================================
+
+	/**
+	 * header.jsp ${user.isAuthenticated()} 用
+	 */
+	public boolean isAuthenticated() {
+		return isAuth;
+	}
+
+	/**
+	 * header.jsp ${user.getName()} 用
+	 */
+	public String getName() {
+		return user_name;
+	}
 }

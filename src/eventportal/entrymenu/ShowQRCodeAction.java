@@ -4,53 +4,83 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
+import bean.Event;
+import bean.Ticket;
+import bean.User;
 import dao.EventDao;
 import dao.TicketDao;
 import tool.Action;
 
+/**
+ * QRコード表示アクション
+ * ※ Strutsは使わず、独自フロントコントローラーパターンで動作
+ */
 public class ShowQRCodeAction extends Action {
+	@Override
+	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+		System.out.println("QRコード表示処理開始");
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form,
-            HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// セッションからユーザー情報を取得
+		HttpSession session = req.getSession(false);
+		User user = (User) session.getAttribute("user");
 
-        // セッションチェック
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            return mapping.findForward("login");
-        }
+		// ログインチェック
+		if (user == null) {
+			System.out.println("未ログイン：ログイン画面にリダイレクト");
+			res.sendRedirect(req.getContextPath() + "/eventportal/auth/EntryLogin.action");
+			return;
+		}
 
-        Integer userId = (Integer) session.getAttribute("userId");
+		// イベントIDを取得
+		String eventId = req.getParameter("eventId");
+		if (eventId == null || eventId.isEmpty()) {
+			System.out.println("エラー：イベントIDが指定されていません");
+			req.setAttribute("errorMessage", "イベントIDが指定されていません。");
+			req.getRequestDispatcher("/error.jsp").forward(req, res);
+			return;
+		}
 
-        // イベントID取得
-        String eventIdStr = request.getParameter("eventId");
-        if (eventIdStr == null || eventIdStr.isEmpty()) {
-            request.setAttribute("errorMessage", "イベントIDが指定されていません。");
-            return mapping.findForward("error");
-        }
+		System.out.println("イベントID: " + eventId);
 
-        Integer eventId = Integer.parseInt(eventIdStr);
+		try {
+			// イベント情報を取得
+			EventDao eventDao = new EventDao();
+			Event event = eventDao.get(eventId);
 
-        // イベント情報取得
-        EventDao eventDao = new EventDao();
-        Event event = eventDao.get(eventId);
-        if (event == null) {
-            request.setAttribute("errorMessage", "指定されたイベントが見つかりません。");
-            return mapping.findForward("error");
-        }
+			if (event == null) {
+				System.out.println("エラー：イベントが見つかりません");
+				req.setAttribute("errorMessage", "指定されたイベントが見つかりません。");
+				req.getRequestDispatcher("/error.jsp").forward(req, res);
+				return;
+			}
 
-        // チケット情報取得
-        TicketDao ticketDao = new TicketDao();
-        Ticket ticket = ticketDao.getByUserAndEvent(userId, eventId);
+			System.out.println("イベント名: " + event.getEventName());
 
-        // リクエストスコープに設定
-        request.setAttribute("event", event);
-        request.setAttribute("ticket", ticket);
+			// チケット情報を取得
+			TicketDao ticketDao = new TicketDao();
+			Ticket ticket = ticketDao.getByEventAndUser(eventId, user.getUser_id());
 
-        return mapping.findForward("success");
-    }
+			if (ticket == null) {
+				System.out.println("エラー：チケットが見つかりません");
+				req.setAttribute("errorMessage", "このイベントのチケットが見つかりません。");
+				req.getRequestDispatcher("/error.jsp").forward(req, res);
+				return;
+			}
+
+			System.out.println("チケットID: " + ticket.getTicketId());
+
+			// リクエストスコープに設定
+			req.setAttribute("event", event);
+			req.setAttribute("ticket", ticket);
+
+			// QRコード表示JSPへフォワード
+			req.getRequestDispatcher("/eventportal/qr/showQRCode.jsp").forward(req, res);
+
+		} catch (Exception e) {
+			System.err.println("QRコード表示エラー: " + e.getMessage());
+			e.printStackTrace();
+			req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
+			req.getRequestDispatcher("/error.jsp").forward(req, res);
+		}
+	}
 }
