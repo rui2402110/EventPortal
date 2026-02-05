@@ -17,20 +17,44 @@ import tool.Action;
 public class MyTicketsAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        HttpSession session = req.getSession();
+        System.out.println("=== マイチケット一覧表示処理開始 ===");
+
+        // セッションからユーザー情報を取得
+        HttpSession session = req.getSession(false);
         User user = (User) session.getAttribute("user");
 
+        // ログインチェック
         if (user == null) {
             res.sendRedirect(req.getContextPath() + "/eventportal/auth/EntryLogin.action");
             return;
         }
 
-        TicketDao ticketDao = new TicketDao();
-        List<Ticket> tickets = ticketDao.getByUserId(user.getUser_id());
+        try {
+            TicketDao ticketDao = new TicketDao();
 
-        System.out.println("マイチケット取得: ユーザーID=" + user.getUser_id() + ", チケット数=" + tickets.size());
+            // このユーザーの全チケットを取得
+            List<Ticket> tickets = ticketDao.getByUserId(user.getUser_id());
 
-        req.setAttribute("tickets", tickets);
-        req.getRequestDispatcher("/eventportal/qr/my_tickets.jsp").forward(req, res);
+            System.out.println("チケット数: " + tickets.size());
+
+            // リクエストスコープに設定
+            req.setAttribute("tickets", tickets);
+
+            // エラーメッセージがあれば表示
+            String errorMessage = (String) session.getAttribute("errorMessage");
+            if (errorMessage != null) {
+                req.setAttribute("errorMessage", errorMessage);
+                session.removeAttribute("errorMessage");
+            }
+
+            // JSPにフォワード
+            req.getRequestDispatcher("/eventportal/entry/my_tickets.jsp").forward(req, res);
+
+        } catch (Exception e) {
+            System.err.println("マイチケット一覧表示エラー: " + e.getMessage());
+            e.printStackTrace();
+            req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
+            req.getRequestDispatcher("/error.jsp").forward(req, res);
+        }
     }
 }

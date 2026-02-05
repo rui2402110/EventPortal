@@ -202,5 +202,23 @@ public class Event implements Serializable {
 	public void setTotalPayment(Integer totalPayment) {
 		this.totalPayment = totalPayment;
 	}
+	/** ユーザーがこのイベントのチケットを持っているか */
+	private boolean hasTicket;
+
+	/**
+	 * チケット所持状態を取得
+	 * @return true:所持, false:未所持
+	 */
+	public boolean isHasTicket() {
+	    return hasTicket;
+	}
+
+	/**
+	 * チケット所持状態を設定
+	 * @param hasTicket チケット所持状態
+	 */
+	public void setHasTicket(boolean hasTicket) {
+	    this.hasTicket = hasTicket;
+	}
 
 }

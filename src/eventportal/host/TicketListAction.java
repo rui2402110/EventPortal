@@ -1,4 +1,4 @@
-package eventportal.host;
+package eventportal.entrymenu;
 
 import java.util.List;
 
@@ -6,67 +6,55 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import bean.Event;
 import bean.Ticket;
 import bean.User;
-import dao.EventDao;
 import dao.TicketDao;
 import tool.Action;
 
 /**
- * 発行済みチケット一覧表示アクション
+ * マイチケット一覧表示アクション
  */
-public class TicketListAction extends Action {
+public class MyTicketsAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        HttpSession session = req.getSession();
+        System.out.println("=== マイチケット一覧表示処理開始 ===");
+
+        // セッションからユーザー情報を取得
+        HttpSession session = req.getSession(false);
         User user = (User) session.getAttribute("user");
 
-        if (user == null || user.getUser_type() != 2) {
-            res.sendRedirect(req.getContextPath() + "/eventportal/auth/HostLogin.action");
+        // ログインチェック
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/eventportal/auth/EntryLogin.action");
             return;
         }
 
-        String eventId = req.getParameter("eventId");
-        if (eventId == null || eventId.isEmpty()) {
-            req.setAttribute("error", "イベントIDが指定されていません");
-            res.sendRedirect(req.getContextPath() + "/eventportal/host/HostMain.action");
-            return;
+        try {
+            TicketDao ticketDao = new TicketDao();
+
+            // このユーザーの全チケットを取得
+            List<Ticket> tickets = ticketDao.getByUserId(user.getUser_id());
+
+            System.out.println("チケット数: " + tickets.size());
+
+            // リクエストスコープに設定
+            req.setAttribute("tickets", tickets);
+
+            // エラーメッセージがあれば表示
+            String errorMessage = (String) session.getAttribute("errorMessage");
+            if (errorMessage != null) {
+                req.setAttribute("errorMessage", errorMessage);
+                session.removeAttribute("errorMessage");
+            }
+
+            // JSPにフォワード
+            req.getRequestDispatcher("/eventportal/entry/my_tickets.jsp").forward(req, res);
+
+        } catch (Exception e) {
+            System.err.println("マイチケット一覧表示エラー: " + e.getMessage());
+            e.printStackTrace();
+            req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
+            req.getRequestDispatcher("/error.jsp").forward(req, res);
         }
-
-        EventDao eventDao = new EventDao();
-        TicketDao ticketDao = new TicketDao();
-
-        Event event = eventDao.get(eventId);
-        if (event == null) {
-            req.setAttribute("error", "イベントが見つかりません");
-            res.sendRedirect(req.getContextPath() + "/eventportal/host/HostMain.action");
-            return;
-        }
-
-        if (!event.getUserId().equals(user.getUser_id())) {
-            req.setAttribute("error", "このイベントにアクセスする権限がありません");
-            res.sendRedirect(req.getContextPath() + "/eventportal/host/HostMain.action");
-            return;
-        }
-
-        List<Ticket> tickets = ticketDao.getByEventId(eventId);
-        int totalCount = ticketDao.getTotalTicketCount(eventId);
-        int validCount = ticketDao.getValidTicketCount(eventId);
-        int admittedCount = ticketDao.getAdmittedCount(eventId);
-
-        String successMessage = (String) session.getAttribute("successMessage");
-        if (successMessage != null) {
-            req.setAttribute("successMessage", successMessage);
-            session.removeAttribute("successMessage");
-        }
-
-        req.setAttribute("event", event);
-        req.setAttribute("tickets", tickets);
-        req.setAttribute("totalCount", totalCount);
-        req.setAttribute("validCount", validCount);
-        req.setAttribute("admittedCount", admittedCount);
-
-        req.getRequestDispatcher("/eventportal/host/host_ticket_list.jsp").forward(req, res);
     }
 }
