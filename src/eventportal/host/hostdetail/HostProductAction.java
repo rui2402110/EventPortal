@@ -30,15 +30,21 @@ public class HostProductAction extends Action {
         case "1":
         	System.out.println("開催前グッズフード処理開始");
             // 1のときの処理
-        	proList = proDao.getByEventId(eventId);
+        	proList = proDao.productGet(eventId);
 
         	 req.setAttribute("proList", proList);
+        	 req.setAttribute("eventId", eventId);
         	 req.getRequestDispatcher("../product_before.jsp").forward(req, res);
         	 break;
         case "2":
         	System.out.println("開催中グッズフード処理開始");
             // 2のときの処理
-            break;
+        	proList = proDao.productGet(eventId);
+
+        	req.setAttribute("proList", proList);
+        	req.setAttribute("eventId", eventId);
+        	req.getRequestDispatcher("../product_holding.jsp").forward(req, res);
+
         case "3":
         	System.out.println("開催後グッズフード処理開始");
             // 3のときの処理

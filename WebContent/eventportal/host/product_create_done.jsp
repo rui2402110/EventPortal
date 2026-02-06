@@ -13,7 +13,7 @@
     <div class="header">イベントポータル</div>
 
     <div class="content">
-    イベントが開催しました
+    グッズが作成できました
     </div>
 
     <a href="${pageContext.request.contextPath}/eventportal/host/HostMenu.action">戻る</a>

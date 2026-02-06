@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -9,12 +10,37 @@
   <title>イベントポータル - グッズ・フード</title>
   <!-- 共通CSS -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/common/style.css">
+  <style>
+  	.product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+    display: block;
+	}
+
+	.product-image-wrapper {
+	    width: 80px;
+	    height: 80px;
+	    background-color: #f5f5f5;
+	    border: 1px solid #ddd;
+	    border-radius: 4px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    font-size: 10px;
+	    color: #999;
+	    text-align: center;
+	}
+  </style>
 </head>
 <body>
 <div>
     <div class="action-buttons">
         <a href="${pageContext.request.contextPath}/eventportal/host/HostEventDetail.action?eventId=${param.eventId}" class="btn btn-secondary">イベント詳細に戻る</a>
-        <a href="${pageContext.request.contextPath}/eventportal/host/hostDetail/ProductCreate.action?eventId=${param.eventId}" class="btn btn-success">新規商品登録</a>
+        <a href="${pageContext.request.contextPath}/eventportal/host/hostdetail/ProductCreate.action?eventId=${param.eventId}" class="btn btn-success">新規商品登録</a>
     </div>
     <c:choose>
         <c:when test="${not empty proList}">
@@ -36,15 +62,30 @@
                             <td>
                                 <c:choose>
                                     <c:when test="${not empty product.image}">
-                                        <img src="${pageContext.request.contextPath}${product.image}"
+                                        <!-- 画像パスの処理 -->
+                                        <c:set var="imagePath" value="${product.image}" />
+
+                                        <!-- 先頭にスラッシュがない場合は追加 -->
+                                        <c:if test="${!fn:startsWith(imagePath, '/')}">
+                                            <c:set var="imagePath" value="/${imagePath}" />
+                                        </c:if>
+
+                                        <!-- スペースを%20に変換（URLエンコード） -->
+                                        <c:set var="imagePath" value="${fn:replace(imagePath, ' ', '%20')}" />
+
+                                        <!-- onerrorで存在しない画像を呼び出さず、代替表示に切り替え -->
+                                        <img src="${pageContext.request.contextPath}${imagePath}"
                                              alt="${product.productName}"
                                              class="product-image"
-                                             onerror="this.src='${pageContext.request.contextPath}/images/no-image.png'" />
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                        <div class="product-image-wrapper" style="display:none;">
+                                            画像<br>読込失敗
+                                        </div>
                                     </c:when>
                                     <c:otherwise>
-                                        <img src="${pageContext.request.contextPath}/images/no-image.png"
-                                             alt="画像なし"
-                                             class="product-image" />
+                                        <div class="product-image-wrapper">
+                                            画像なし
+                                        </div>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
@@ -83,11 +124,11 @@
                                 </c:choose>
                             </td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/eventportal/host/hostDetail/ProductEdit.action?itemId=${product.itemId}"
+                                <a href="${pageContext.request.contextPath}/eventportal/host/hostdetail/ProductEdit.action?itemId=${product.itemId}"
                                    class="btn btn-edit">編集</a>
-                                <a href="${pageContext.request.contextPath}/eventportal/host/hostDetail/ProductDelete.action?itemId=${product.itemId}"
-                                   class="btn btn-danger"
-                                   onclick="return confirm('本当に削除しますか？')">削除</a>
+
+                                <a href="${pageContext.request.contextPath}/eventportal/host/hostdetail/ProductDelete.action?itemId=${product.itemId}"
+                                   class="btn btn-danger">削除</a>
                             </td>
                         </tr>
                     </c:forEach>

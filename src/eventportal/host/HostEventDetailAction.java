@@ -26,6 +26,7 @@ public class HostEventDetailAction extends Action {
 
 		// JSPに送るデータをセット
 		req.setAttribute("evt", event);
+		req.setAttribute("eventId", eventId);
 		// フォワード
 		req.getRequestDispatcher("/eventportal/host/host_event_detail.jsp").forward(req, res);
 	}
