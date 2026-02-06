@@ -33,16 +33,7 @@ public class EntryEventManageAction extends Action {
 
         try {
             EventDao eventDao = new EventDao();
-            List<Event> list = null;
-
-            // ★★★ 修正：filterメソッドの代わりにgetAllを使用 ★★★
-            try {
-                list = eventDao.filter(null);
-            } catch (Exception e) {
-                // filterメソッドが存在しない場合はgetAllを試す
-                System.out.println("filterメソッドが見つかりません。getAllを使用します。");
-                list = eventDao.getAll();
-            }
+            List<Event> list = eventDao.filter(null);
 
             System.out.println("取得したイベント数: " + list.size());
 

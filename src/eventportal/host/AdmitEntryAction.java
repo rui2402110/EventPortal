@@ -21,25 +21,21 @@ public class AdmitEntryAction extends Action {
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
         System.out.println("=== 入場処理開始 ===");
 
-        // セッションからユーザー情報を取得
         HttpSession session = req.getSession(false);
         User user = (User) session.getAttribute("user");
 
-        // ログインチェック
         if (user == null) {
             System.out.println("エラー：未ログイン");
             res.sendRedirect(req.getContextPath() + "/eventportal/auth/HostLogin.action");
             return;
         }
 
-        // パラメータ取得
         String eventId = req.getParameter("eventId");
         String ticketId = req.getParameter("ticketId");
 
         System.out.println("イベントID: " + eventId);
         System.out.println("チケットID: " + ticketId);
 
-        // パラメータチェック
         if (eventId == null || eventId.isEmpty() || ticketId == null || ticketId.isEmpty()) {
             System.out.println("エラー：パラメータ不足");
             req.setAttribute("result", "error");
@@ -50,11 +46,9 @@ public class AdmitEntryAction extends Action {
         }
 
         try {
-            // DAOのインスタンス化
             TicketDao ticketDao = new TicketDao();
             EventDao eventDao = new EventDao();
 
-            // チケット情報を取得
             Ticket ticket = ticketDao.get(ticketId);
 
             if (ticket == null) {
@@ -66,7 +60,6 @@ public class AdmitEntryAction extends Action {
                 return;
             }
 
-            // イベントIDの照合
             if (!eventId.equals(ticket.getEventId())) {
                 System.out.println("エラー：イベントIDが一致しません");
                 req.setAttribute("result", "error");
@@ -76,12 +69,9 @@ public class AdmitEntryAction extends Action {
                 return;
             }
 
-            // イベント情報を取得
             Event event = eventDao.get(eventId);
 
-            // ステータスチェック
             if (ticket.getStatus() == 2) {
-                // 使用済み
                 System.out.println("警告：使用済みチケット");
                 req.setAttribute("result", "used");
                 req.setAttribute("ticket", ticket);
@@ -92,7 +82,6 @@ public class AdmitEntryAction extends Action {
             }
 
             if (ticket.getStatus() != 1) {
-                // 無効なチケット
                 System.out.println("エラー：無効なチケット");
                 req.setAttribute("result", "error");
                 req.setAttribute("errorMessage", "このチケットは無効です。");
@@ -101,14 +90,12 @@ public class AdmitEntryAction extends Action {
                 return;
             }
 
-            // 入場処理：ステータスを2（使用済み）に更新
             Timestamp now = new Timestamp(System.currentTimeMillis());
             int updateCount = ticketDao.updateStatus(ticketId, 2, now);
 
             if (updateCount > 0) {
                 System.out.println("入場処理成功");
 
-                // 更新後のチケット情報を再取得
                 ticket = ticketDao.get(ticketId);
 
                 req.setAttribute("result", "success");

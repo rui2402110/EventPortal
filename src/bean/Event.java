@@ -1,9 +1,11 @@
 package bean;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
- * イベントBean
+ * イベントBean（完全版）
  */
 public class Event implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -47,6 +49,30 @@ public class Event implements Serializable {
     /** ユーザーがこのイベントのチケットを持っているか */
     private boolean hasTicket;
 
+    /** カテゴリID */
+    private String categoryId;
+
+    /** クレジット */
+    private String credit;
+
+    /** イベント追加日 */
+    private String eventAddDate;
+
+    /** 会場内マップ */
+    private String mapInHall;
+
+    /** 会場外マップ */
+    private String mapOutOfHall;
+
+    /** チケット情報 */
+    private String ticketInfo;
+
+    /** ユーザーID */
+    private String userId;
+
+    /** 合計支払額 */
+    private int totalPayment;
+
     /**
      * デフォルトコンストラクタ
      */
@@ -79,12 +105,20 @@ public class Event implements Serializable {
         this.holdingDate = holdingDate;
     }
 
+    public void setHoldingDate(LocalDate holdingDate) {
+        this.holdingDate = holdingDate != null ? holdingDate.toString() : null;
+    }
+
     public String getHoldingTime() {
         return holdingTime;
     }
 
     public void setHoldingTime(String holdingTime) {
         this.holdingTime = holdingTime;
+    }
+
+    public void setHoldingTime(LocalTime holdingTime) {
+        this.holdingTime = holdingTime != null ? holdingTime.toString() : null;
     }
 
     public String getAddress() {
@@ -151,28 +185,84 @@ public class Event implements Serializable {
         this.hostName = hostName;
     }
 
-    /**
-     * チケット所持状態を取得
-     * @return true:チケット所持, false:未所持
-     */
     public boolean isHasTicket() {
         return hasTicket;
     }
 
-    /**
-     * チケット所持状態を取得（JSP用）
-     * @return true:チケット所持, false:未所持
-     */
     public boolean getHasTicket() {
         return hasTicket;
     }
 
-    /**
-     * チケット所持状態を設定
-     * @param hasTicket チケット所持状態
-     */
     public void setHasTicket(boolean hasTicket) {
         this.hasTicket = hasTicket;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCredit() {
+        return credit;
+    }
+
+    public void setCredit(String credit) {
+        this.credit = credit;
+    }
+
+    public String getEventAddDate() {
+        return eventAddDate;
+    }
+
+    public void setEventAddDate(String eventAddDate) {
+        this.eventAddDate = eventAddDate;
+    }
+
+    public void setEventAddDate(LocalDate eventAddDate) {
+        this.eventAddDate = eventAddDate != null ? eventAddDate.toString() : null;
+    }
+
+    public String getMapInHall() {
+        return mapInHall;
+    }
+
+    public void setMapInHall(String mapInHall) {
+        this.mapInHall = mapInHall;
+    }
+
+    public String getMapOutOfHall() {
+        return mapOutOfHall;
+    }
+
+    public void setMapOutOfHall(String mapOutOfHall) {
+        this.mapOutOfHall = mapOutOfHall;
+    }
+
+    public String getTicketInfo() {
+        return ticketInfo;
+    }
+
+    public void setTicketInfo(String ticketInfo) {
+        this.ticketInfo = ticketInfo;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getTotalPayment() {
+        return totalPayment;
+    }
+
+    public void setTotalPayment(int totalPayment) {
+        this.totalPayment = totalPayment;
     }
 
     @Override
@@ -185,6 +275,7 @@ public class Event implements Serializable {
                 ", address='" + address + '\'' +
                 ", maxCount=" + maxCount +
                 ", eventHoldState='" + eventHoldState + '\'' +
+                ", categoryId='" + categoryId + '\'' +
                 ", hasTicket=" + hasTicket +
                 '}';
     }

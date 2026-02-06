@@ -18,7 +18,7 @@ import tool.Action;
 public class CreateTicketAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        HttpSession session = req.getSession();
+        HttpSession session = req.getSession(false);
         User user = (User) session.getAttribute("user");
 
         if (user == null || user.getUser_type() != 2) {
@@ -31,7 +31,8 @@ public class CreateTicketAction extends Action {
         EventDao eventDao = new EventDao();
         UserDaoEx userDaoEx = new UserDaoEx();
 
-        List<Event> events = eventDao.userIdFilter(user.getUser_id());
+        // ★ userIdFilter() → getByHostId() に変更
+        List<Event> events = eventDao.getByHostId(user.getUser_id());
         List<User> entryUsers = userDaoEx.getByType(1);
 
         req.setAttribute("events", events);
