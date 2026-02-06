@@ -1,42 +1,73 @@
 package bean;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 /**
- * チケット情報を保持するBeanクラス
+ * チケットBean
  */
 public class Ticket implements Serializable {
-    private String ticketId;           // チケットID
-    private String userId;             // ユーザーID
-    private String eventId;            // イベントID
-    private String qrImagePath;        // QRコード画像ファイルパス
-    private String qrImageData;        // QRコード画像データ（Base64）
-    private int status;                // ステータス（1:有効, 2:使用済み, 3:無効）
-    private String ticketInfo;         // チケット情報（座席番号など）
-    private LocalDateTime createdAt;   // 作成日時
-    private LocalDateTime usedAt;      // 使用日時
-    private Event event;               // イベント情報（JOIN用）
+    private static final long serialVersionUID = 1L;
 
-    // コンストラクタ
+    /** チケットID */
+    private String ticketId;
+
+    /** イベントID */
+    private String eventId;
+
+    /** ユーザーID */
+    private String userId;
+
+    /** 参加者名 */
+    private String participantName;
+
+    /** ステータス (1:有効, 2:使用済み, 3:無効) */
+    private int status;
+
+    /** QR画像データ (Base64エンコード) */
+    private String qrImageData;
+
+    /** QR画像パス */
+    private String qrImagePath;
+
+    /** 使用日時 */
+    private Timestamp usedAt;
+
+    // ステータス定数
+    public static final int STATUS_VALID = 1;
+    public static final int STATUS_USED = 2;
+    public static final int STATUS_INVALID = 3;
+
+    /**
+     * デフォルトコンストラクタ
+     */
     public Ticket() {
     }
 
-    // Getter & Setter
+    /**
+     * コンストラクタ
+     * @param ticketId チケットID
+     * @param eventId イベントID
+     * @param userId ユーザーID
+     * @param participantName 参加者名
+     * @param status ステータス
+     */
+    public Ticket(String ticketId, String eventId, String userId, String participantName, int status) {
+        this.ticketId = ticketId;
+        this.eventId = eventId;
+        this.userId = userId;
+        this.participantName = participantName;
+        this.status = status;
+    }
+
+    // ========== Getter / Setter ==========
+
     public String getTicketId() {
         return ticketId;
     }
 
     public void setTicketId(String ticketId) {
         this.ticketId = ticketId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getEventId() {
@@ -47,20 +78,20 @@ public class Ticket implements Serializable {
         this.eventId = eventId;
     }
 
-    public String getQrImagePath() {
-        return qrImagePath;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setQrImagePath(String qrImagePath) {
-        this.qrImagePath = qrImagePath;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public String getQrImageData() {
-        return qrImageData;
+    public String getParticipantName() {
+        return participantName;
     }
 
-    public void setQrImageData(String qrImageData) {
-        this.qrImageData = qrImageData;
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
     }
 
     public int getStatus() {
@@ -71,61 +102,81 @@ public class Ticket implements Serializable {
         this.status = status;
     }
 
-    public String getTicketInfo() {
-        return ticketInfo;
+    public String getQrImageData() {
+        return qrImageData;
     }
 
-    public void setTicketInfo(String ticketInfo) {
-        this.ticketInfo = ticketInfo;
+    public void setQrImageData(String qrImageData) {
+        this.qrImageData = qrImageData;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getQrImagePath() {
+        return qrImagePath;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setQrImagePath(String qrImagePath) {
+        this.qrImagePath = qrImagePath;
     }
 
-    public LocalDateTime getUsedAt() {
+    public Timestamp getUsedAt() {
         return usedAt;
     }
 
-    public void setUsedAt(LocalDateTime usedAt) {
+    public void setUsedAt(Timestamp usedAt) {
         this.usedAt = usedAt;
     }
 
-    public Event getEvent() {
-        return event;
-    }
+    // ========== 便利メソッド ==========
 
-    public void setEvent(Event event) {
-        this.event = event;
-    }
-
-    // ユーティリティメソッド
     public boolean isValid() {
-        return status == 1;
+        return status == STATUS_VALID;
     }
 
     public boolean isUsed() {
-        return status == 2;
+        return status == STATUS_USED;
     }
 
     public boolean isInvalid() {
-        return status == 3;
+        return status == STATUS_INVALID;
     }
 
-    public String getStatusText() {
+    public String getStatusString() {
         switch (status) {
-            case 1:
+            case STATUS_VALID:
                 return "有効";
-            case 2:
+            case STATUS_USED:
                 return "使用済み";
-            case 3:
+            case STATUS_INVALID:
                 return "無効";
             default:
                 return "不明";
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "ticketId='" + ticketId + '\'' +
+                ", eventId='" + eventId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", participantName='" + participantName + '\'' +
+                ", status=" + status +
+                ", qrImageData=" + (qrImageData != null ? "存在" : "なし") +
+                ", qrImagePath='" + qrImagePath + '\'' +
+                ", usedAt=" + usedAt +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ticket ticket = (Ticket) o;
+        return ticketId != null ? ticketId.equals(ticket.ticketId) : ticket.ticketId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return ticketId != null ? ticketId.hashCode() : 0;
     }
 }

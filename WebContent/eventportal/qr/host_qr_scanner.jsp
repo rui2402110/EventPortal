@@ -6,55 +6,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QRコードスキャン | イベントポータル</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
             background: #f5f5f5;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .top-btn {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .top-btn:hover {
+            background: white;
+            color: #667eea;
         }
 
         .container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
 
         .header {
-            background: #17a2b8;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+
+        .event-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .event-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .stat-item {
             text-align: center;
-            border-radius: 10px;
-            margin-bottom: 20px;
         }
 
-        .scan-container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
         }
 
-        .scan-area {
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .scanner-container {
             position: relative;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 30px;
-            background: #000;
-            border-radius: 10px;
+            margin: 20px 0;
+            border-radius: 15px;
             overflow: hidden;
         }
 
-        #video {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        #canvas {
-            display: none;
+        #qr-reader {
+            border-radius: 15px;
+            overflow: hidden;
         }
 
         .scan-overlay {
@@ -64,267 +131,284 @@
             transform: translate(-50%, -50%);
             width: 250px;
             height: 250px;
-            border: 3px solid #28a745;
-            border-radius: 10px;
             pointer-events: none;
+        }
+
+        .scan-corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #4facfe;
+        }
+
+        .scan-corner.top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .scan-corner.top-right {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .scan-corner.bottom-left {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+        }
+
+        .scan-corner.bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
         }
 
         .scan-line {
             position: absolute;
             width: 100%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, #28a745, transparent);
+            background: linear-gradient(90deg, transparent, #4facfe, transparent);
             animation: scan 2s linear infinite;
         }
 
         @keyframes scan {
             0% { top: 0; }
-            100% { top: 100%; }
+            50% { top: 100%; }
+            100% { top: 0; }
         }
 
         .manual-input {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid #e9ecef;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .manual-input h3 {
+            margin-top: 0;
         }
 
         .input-group {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
         }
 
-        .input-field {
+        .input-group input {
             flex: 1;
             padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
             font-size: 16px;
         }
 
         .btn {
             padding: 12px 30px;
-            background: #007bff;
-            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn:hover {
-            background: #0056b3;
-        }
-
-        .btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .btn-success {
-            background: #28a745;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        .status-message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
             font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .status-scanning {
-            background: #cfe2ff;
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .info-message {
+            background: #e7f3ff;
             color: #004085;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .info-text {
-            text-align: center;
-            color: #6c757d;
+            padding: 15px;
+            border-radius: 8px;
             margin: 20px 0;
+            border-left: 4px solid #4facfe;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .top-bar-right {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- トップバー -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span style="font-size: 24px; font-weight: bold;">🎫 イベント管理</span>
+        </div>
+        <div class="top-bar-right">
+            <span class="user-name">${user.user_name} 様</span>
+            <a href="${pageContext.request.contextPath}/eventportal/host/HostMenu.action"
+               class="top-btn">🏠 トップページ</a>
+            <a href="${pageContext.request.contextPath}/eventportal/auth/Logout.action"
+               class="top-btn">🚪 ログアウト</a>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
-            <h1>QRコードスキャン</h1>
-            <p>イベント: ${event.eventName}</p>
+            <h1>📱 QRコード入場受付</h1>
         </div>
 
-        <div class="scan-container">
-            <div class="scan-area">
-                <video id="video" autoplay playsinline></video>
-                <canvas id="canvas"></canvas>
-                <div class="scan-overlay">
-                    <div class="scan-line"></div>
+        <div class="event-info">
+            <div class="event-name">${event.eventName}</div>
+            <div>開催日: ${event.holdingDate}</div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value">${admittedCount}</div>
+                    <div class="stat-label">入場者数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${event.maxCount}</div>
+                    <div class="stat-label">定員</div>
                 </div>
             </div>
+        </div>
 
-            <div class="status-message status-scanning">
-                <span id="scanStatus">カメラでQRコードをスキャンしてください</span>
+        <div class="info-message">
+            📷 カメラでQRコードをスキャンするか、下の入力欄にチケットIDを入力してください
+        </div>
+
+        <div class="scanner-container">
+            <div id="qr-reader"></div>
+            <div class="scan-overlay">
+                <div class="scan-corner top-left"></div>
+                <div class="scan-corner top-right"></div>
+                <div class="scan-corner bottom-left"></div>
+                <div class="scan-corner bottom-right"></div>
+                <div class="scan-line"></div>
             </div>
+        </div>
 
-            <div class="info-text">
-                <p>参加者のQRコードをカメラに向けてください。</p>
-                <p>自動的に読み取りを行います。</p>
-            </div>
+        <div class="manual-input">
+            <h3>🔢 手動入力</h3>
+            <form action="${pageContext.request.contextPath}/eventportal/host/AdmitEntry.action" method="POST" id="manualForm">
+                <input type="hidden" name="eventId" value="${event.eventId}">
+                <div class="input-group">
+                    <input type="text"
+                           name="ticketId"
+                           id="ticketIdInput"
+                           placeholder="チケットID (例: TKT001)"
+                           pattern="TKT[0-9]{3,}"
+                           required>
+                    <button type="submit" class="btn btn-primary">入場承認</button>
+                </div>
+            </form>
+        </div>
 
-            <div class="manual-input">
-                <h3>手動入力</h3>
-                <p>カメラが使用できない場合は、チケットIDを手動で入力してください。</p>
-
-                <form action="${pageContext.request.contextPath}/eventportal/host/VerifyTicket.action"
-                      method="post">
-                    <input type="hidden" name="eventId" value="${event.eventId}">
-
-                    <div class="input-group">
-                        <input type="text"
-                               name="ticketId"
-                               id="manualInput"
-                               class="input-field"
-                               placeholder="チケットIDを入力"
-                               required>
-                        <button type="submit" class="btn btn-success">確認</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="button-group">
-                <a href="${pageContext.request.contextPath}/eventportal/host/HostEventDetail.action?eventId=${event.eventId}"
-                   class="btn btn-danger">戻る</a>
-            </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="${pageContext.request.contextPath}/eventportal/host/HostEventDetail.action?eventId=${event.eventId}"
+               class="btn btn-secondary">
+                イベント詳細に戻る
+            </a>
         </div>
     </div>
 
     <script>
-        let video = document.getElementById('video');
-        let canvas = document.getElementById('canvas');
-        let context = canvas.getContext('2d');
-        let scanning = false;
+        let lastScannedCode = null;
+        let lastScannedTime = 0;
+        const SCAN_COOLDOWN = 3000; // 3秒間は同じコードを無視
 
-        function initCamera() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                const constraints = {
-                    video: {
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    }
-                };
+        function onScanSuccess(decodedText, decodedResult) {
+            const now = Date.now();
 
-                navigator.mediaDevices.getUserMedia(constraints)
-                    .then(function(stream) {
-                        video.srcObject = stream;
-                        video.setAttribute('playsinline', true);
-
-                        video.addEventListener('loadedmetadata', function() {
-                            video.play();
-                            scanning = true;
-                            requestAnimationFrame(scan);
-                        });
-                    })
-                    .catch(function(error) {
-                        console.error('カメラエラー:', error);
-                        document.getElementById('scanStatus').textContent =
-                            'カメラにアクセスできません。手動入力をご利用ください。';
-                        document.querySelector('.status-message').className = 'status-message status-error';
-                    });
-            }
-        }
-
-        function scan() {
-            if (!scanning) return;
-
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.height = video.videoHeight;
-                canvas.width = video.videoWidth;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                try {
-                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                        inversionAttempts: 'dontInvert'
-                    });
-
-                    if (code && code.data) {
-                        scanning = false;
-                        handleQRCode(code.data);
-                        return;
-                    }
-                } catch (error) {
-                    console.error('スキャンエラー:', error);
-                }
+            // 連続スキャン防止
+            if (decodedText === lastScannedCode && (now - lastScannedTime) < SCAN_COOLDOWN) {
+                console.log('同じQRコードを短時間で再スキャンしました。無視します。');
+                return;
             }
 
-            if (scanning) {
-                requestAnimationFrame(scan);
-            }
-        }
+            lastScannedCode = decodedText;
+            lastScannedTime = now;
 
-        function handleQRCode(ticketId) {
-            document.getElementById('scanStatus').textContent = 'QRコード検出。確認中...';
-            document.querySelector('.status-message').className = 'status-message status-success';
+            console.log('QRコード検出:', decodedText);
 
-            // フォーム送信
+            // フォームを作成して送信
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '${pageContext.request.contextPath}/eventportal/host/VerifyTicket.action';
+            form.action = '${pageContext.request.contextPath}/eventportal/host/AdmitEntry.action';
 
             const eventIdInput = document.createElement('input');
             eventIdInput.type = 'hidden';
             eventIdInput.name = 'eventId';
             eventIdInput.value = '${event.eventId}';
-            form.appendChild(eventIdInput);
 
             const ticketIdInput = document.createElement('input');
             ticketIdInput.type = 'hidden';
             ticketIdInput.name = 'ticketId';
-            ticketIdInput.value = ticketId;
-            form.appendChild(ticketIdInput);
+            ticketIdInput.value = decodedText;
 
+            form.appendChild(eventIdInput);
+            form.appendChild(ticketIdInput);
             document.body.appendChild(form);
             form.submit();
         }
 
-        window.addEventListener('load', initCamera);
+        function onScanFailure(error) {
+            // スキャン失敗は頻繁に発生するので、コンソールログのみ
+            // console.warn('QRコードスキャン失敗:', error);
+        }
 
-        window.addEventListener('beforeunload', function() {
-            scanning = false;
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
+        // QRコードリーダーを初期化
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader",
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0,
+                rememberLastUsedCamera: true
+            },
+            false
+        );
+
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+        // 手動入力フォームのバリデーション
+        document.getElementById('manualForm').addEventListener('submit', function(e) {
+            const ticketId = document.getElementById('ticketIdInput').value.trim();
+            if (!ticketId.match(/^TKT[0-9]{3,}$/)) {
+                e.preventDefault();
+                alert('チケットIDは「TKT」に続けて3桁以上の数字を入力してください（例: TKT001）');
+                return false;
             }
         });
     </script>

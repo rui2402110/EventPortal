@@ -8,28 +8,60 @@ import javax.servlet.http.HttpSession;
 
 import bean.Event;
 import bean.User;
-import dao.EntryEventDao;
+import dao.EventDao;
+import dao.TicketDao;
 import tool.Action;
 
-public class EntryEventManageAction  extends Action  {
-	@Override
-	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		// リストの定義
-		List<Event> event = null;
-		// DAOの定義
-		EntryEventDao eeDao = new EntryEventDao();
-		// ユーザーIDを取得
-		HttpSession session = req.getSession(false);
-		User user = (User) session.getAttribute("user");
-		String userId = user.getUser_id();
-		System.out.println(userId);
+/**
+ * 参加イベント一覧表示アクション
+ */
+public class EntryEventManageAction extends Action {
+    @Override
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        System.out.println("=== イベント一覧表示処理開始 ===");
 
-		event = eeDao.entryJoinedEventGet(userId);
-		System.out.println(event);
+        HttpSession session = req.getSession(false);
+        User user = (User) session.getAttribute("user");
 
-		req.setAttribute("event",event);
-		req.getRequestDispatcher("/eventportal/entry/entry_event_manage.jsp").forward(req, res);
+        if (user == null) {
+            System.out.println("未ログイン：ログイン画面にリダイレクト");
+            res.sendRedirect(req.getContextPath() + "/eventportal/auth/EntryLogin.action");
+            return;
+        }
 
-	}
+        System.out.println("ユーザーID: " + user.getUser_id());
 
+        try {
+            EventDao eventDao = new EventDao();
+            List<Event> list = eventDao.filter(null);
+
+            System.out.println("取得したイベント数: " + list.size());
+
+            TicketDao ticketDao = new TicketDao();
+            for (Event event : list) {
+                boolean hasTicket = ticketDao.getByEventAndUser(event.getEventId(), user.getUser_id()) != null;
+                event.setHasTicket(hasTicket);
+
+                System.out.println("イベント: " + event.getEventId() +
+                                 " (" + event.getEventName() + ") - " +
+                                 "チケット所持: " + (hasTicket ? "あり" : "なし"));
+            }
+
+            req.setAttribute("list", list);
+
+            String successMessage = (String) session.getAttribute("successMessage");
+            if (successMessage != null) {
+                req.setAttribute("successMessage", successMessage);
+                session.removeAttribute("successMessage");
+            }
+
+            req.getRequestDispatcher("/eventportal/entry/entry_event_manage.jsp").forward(req, res);
+
+        } catch (Exception e) {
+            System.err.println("イベント一覧表示エラー: " + e.getMessage());
+            e.printStackTrace();
+            req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
+            req.getRequestDispatcher("/error.jsp").forward(req, res);
+        }
+    }
 }

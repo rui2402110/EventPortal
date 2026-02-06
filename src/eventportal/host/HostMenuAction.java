@@ -11,26 +11,32 @@ import bean.User;
 import dao.EventDao;
 import tool.Action;
 
-public class HostMenuAction extends Action  {
-	@Override
-	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		//セッション情報を取得
-		HttpSession session = req.getSession();
-		User user = (User)session.getAttribute("user");
+public class HostMenuAction extends Action {
+    @Override
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        // セッション情報を取得
+        HttpSession session = req.getSession(false);
+        User user = (User) session.getAttribute("user");
 
-		// 取得したデータを格納する変数を定義
-		List<Event> event =null;
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/eventportal/auth/HostLogin.action");
+            return;
+        }
 
-		// DAOを再定義
-		EventDao evtDao = new EventDao();
+        // 取得したデータを格納する変数を定義
+        List<Event> event = null;
 
-		// データを取得
-		event = evtDao.userIdFilter(user.getUser_id());
-		System.out.println(event);
+        // DAOを再定義
+        EventDao evtDao = new EventDao();
 
-		// JSPに送るデータをセット
-		req.setAttribute("event", event);
-		// フォワード
-		req.getRequestDispatcher("/eventportal/host/host_menu.jsp").forward(req, res);
-	}
+        // ★ userIdFilter() → getByHostId() に変更
+        event = evtDao.getByHostId(user.getUser_id());
+        System.out.println(event);
+
+        // JSPに送るデータをセット
+        req.setAttribute("event", event);
+
+        // フォワード
+        req.getRequestDispatcher("/eventportal/host/host_menu.jsp").forward(req, res);
+    }
 }
