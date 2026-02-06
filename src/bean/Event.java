@@ -1,39 +1,33 @@
 package bean;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
+/**
+ * イベントBean
+ */
 public class Event implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /** イベントID */
     private String eventId;
 
     /** イベント名 */
     private String eventName;
 
-    /** イベント概要 */
-    private String eventOverview;
-
     /** 開催日 */
-    private LocalDate holdingDate;
+    private String holdingDate;
 
-    /** 開催時間 */
-    private LocalTime holdingTime;
+    /** 開催時刻 */
+    private String holdingTime;
 
-    /** 開催場所(住所) */
+    /** 住所 */
     private String address;
 
-    /** 会場外マップ */
-    private String mapOutOfHall;
+    /** 定員 */
+    private int maxCount;
 
-    /** 会場内マップ */
-    private String mapInHall;
-
-    /** 最大人数 */
-    private Integer maxCount;
-
-    /** カテゴリID */
-    private String categoryId;
+    /** 開催状態 (1:開催前, 2:開催中, 3:開催後) */
+    private String eventHoldState;
 
     /** 電話番号 */
     private String phoneNumber;
@@ -41,184 +35,157 @@ public class Event implements Serializable {
     /** リンク */
     private String link;
 
-    /** クレジット */
-    private String credit;
+    /** イベント概要 */
+    private String eventOverview;
 
-    /** ユーザーID */
-    private String userId;
+    /** 主催者ID */
+    private String hostId;
 
-    /** チケット情報 */
-    private String ticketInfo;
+    /** 主催者名 */
+    private String hostName;
 
-    /** イベント開催状態 */
-    private String eventHoldState;
+    /** ユーザーがこのイベントのチケットを持っているか */
+    private boolean hasTicket;
 
-    /** イベント作成日 */
-    private LocalDate eventAddDate;
+    /**
+     * デフォルトコンストラクタ
+     */
+    public Event() {
+    }
 
-    /** イベント合計入金額 */
-    private Integer totalPayment;
+    // ========== Getter / Setter ==========
 
-	public String getEventId() {
-		return eventId;
-	}
+    public String getEventId() {
+        return eventId;
+    }
 
-	public void setEventId(String eventId) {
-		this.eventId = eventId;
-	}
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
 
-	public String getEventName() {
-		return eventName;
-	}
+    public String getEventName() {
+        return eventName;
+    }
 
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
 
-	public String getEventOverview() {
-		return eventOverview;
-	}
+    public String getHoldingDate() {
+        return holdingDate;
+    }
 
-	public void setEventOverview(String eventOverview) {
-		this.eventOverview = eventOverview;
-	}
+    public void setHoldingDate(String holdingDate) {
+        this.holdingDate = holdingDate;
+    }
 
-	public LocalDate getHoldingDate() {
-		return holdingDate;
-	}
+    public String getHoldingTime() {
+        return holdingTime;
+    }
 
-	public void setHoldingDate(LocalDate holdingDate) {
-		this.holdingDate = holdingDate;
-	}
+    public void setHoldingTime(String holdingTime) {
+        this.holdingTime = holdingTime;
+    }
 
-	public LocalTime getHoldingTime() {
-		return holdingTime;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public void setHoldingTime(LocalTime holdingTime) {
-		this.holdingTime = holdingTime;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public int getMaxCount() {
+        return maxCount;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    public void setMaxCount(int maxCount) {
+        this.maxCount = maxCount;
+    }
 
-	public String getMapOutOfHall() {
-		return mapOutOfHall;
-	}
+    public String getEventHoldState() {
+        return eventHoldState;
+    }
 
-	public void setMapOutOfHall(String mapOutOfHall) {
-		this.mapOutOfHall = mapOutOfHall;
-	}
+    public void setEventHoldState(String eventHoldState) {
+        this.eventHoldState = eventHoldState;
+    }
 
-	public String getMapInHall() {
-		return mapInHall;
-	}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	public void setMapInHall(String mapInHall) {
-		this.mapInHall = mapInHall;
-	}
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	public Integer getMaxCount() {
-		return maxCount;
-	}
+    public String getLink() {
+        return link;
+    }
 
-	public void setMaxCount(Integer maxCount) {
-		this.maxCount = maxCount;
-	}
+    public void setLink(String link) {
+        this.link = link;
+    }
 
-	public String getCategoryId() {
-		return categoryId;
-	}
+    public String getEventOverview() {
+        return eventOverview;
+    }
 
-	public void setCategoryId(String categoryId) {
-		this.categoryId = categoryId;
-	}
+    public void setEventOverview(String eventOverview) {
+        this.eventOverview = eventOverview;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public String getHostId() {
+        return hostId;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public void setHostId(String hostId) {
+        this.hostId = hostId;
+    }
 
-	public String getLink() {
-		return link;
-	}
+    public String getHostName() {
+        return hostName;
+    }
 
-	public void setLink(String link) {
-		this.link = link;
-	}
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
 
-	public String getCredit() {
-		return credit;
-	}
+    /**
+     * チケット所持状態を取得
+     * @return true:チケット所持, false:未所持
+     */
+    public boolean isHasTicket() {
+        return hasTicket;
+    }
 
-	public void setCredit(String credit) {
-		this.credit = credit;
-	}
+    /**
+     * チケット所持状態を取得（JSP用）
+     * @return true:チケット所持, false:未所持
+     */
+    public boolean getHasTicket() {
+        return hasTicket;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    /**
+     * チケット所持状態を設定
+     * @param hasTicket チケット所持状態
+     */
+    public void setHasTicket(boolean hasTicket) {
+        this.hasTicket = hasTicket;
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getTicketInfo() {
-		return ticketInfo;
-	}
-
-	public void setTicketInfo(String ticketInfo) {
-		this.ticketInfo = ticketInfo;
-	}
-
-	public String getEventHoldState() {
-		return eventHoldState;
-	}
-
-	public void setEventHoldState(String eventHoldState) {
-		this.eventHoldState = eventHoldState;
-	}
-
-	public LocalDate getEventAddDate() {
-		return eventAddDate;
-	}
-
-	public void setEventAddDate(LocalDate eventAddDate) {
-		this.eventAddDate = eventAddDate;
-	}
-
-	public Integer getTotalPayment() {
-		return totalPayment;
-	}
-
-	public void setTotalPayment(Integer totalPayment) {
-		this.totalPayment = totalPayment;
-	}
-	/** ユーザーがこのイベントのチケットを持っているか */
-	private boolean hasTicket;
-
-	/**
-	 * チケット所持状態を取得
-	 * @return true:所持, false:未所持
-	 */
-	public boolean isHasTicket() {
-	    return hasTicket;
-	}
-
-	/**
-	 * チケット所持状態を設定
-	 * @param hasTicket チケット所持状態
-	 */
-	public void setHasTicket(boolean hasTicket) {
-	    this.hasTicket = hasTicket;
-	}
-
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventId='" + eventId + '\'' +
+                ", eventName='" + eventName + '\'' +
+                ", holdingDate='" + holdingDate + '\'' +
+                ", holdingTime='" + holdingTime + '\'' +
+                ", address='" + address + '\'' +
+                ", maxCount=" + maxCount +
+                ", eventHoldState='" + eventHoldState + '\'' +
+                ", hasTicket=" + hasTicket +
+                '}';
+    }
 }
