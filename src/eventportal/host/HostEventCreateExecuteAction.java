@@ -1,129 +1,155 @@
 package eventportal.host;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 
 import bean.Event;
 import bean.User;
-import dao.CategoryDao;
-import dao.FileDao;
-import dao.HostEventDao;
+import dao.Dao;
+import dao.EventDao;
 import tool.Action;
 public class HostEventCreateExecuteAction extends Action {
-	@Override
-	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		System.out.println("イベント作成実行開始");
-		//メソッドとスタブ
-		HttpSession session = req.getSession();
-		User user = (User)session.getAttribute("user");
-		Event event = new Event();
+    @Override
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        System.out.println("=== イベント作成処理開始 ===");
 
-		// 使用するDAOを定義
-		HostEventDao hosEvtDao = new HostEventDao();
-		FileDao fileDao = new FileDao();
-		CategoryDao CatDao = new CategoryDao();
+        HttpSession session = req.getSession(false);
+        User user = (User) session.getAttribute("user");
 
-            // イベント基本情報の取得
-            String eventName = req.getParameter("event_name");
-            String content = req.getParameter("content");
+        if (user == null || user.getUser_type() != 2) {
+            System.out.println("エラー：未ログインまたは権限なし");
+            res.sendRedirect(req.getContextPath() + "/eventportal/auth/HostLogin.action");
+            return;
+        }
 
-            // 日時情報の取得
-            String year = req.getParameter("event_year");
-            String month = req.getParameter("event_month");
-            String day = req.getParameter("event_day");
-            String hour = req.getParameter("event_hour");
-            String minute = req.getParameter("event_minute");
-
-            // LocalDateとLocalTimeに変換
-            LocalDate holdingDate = LocalDate.of(
-                Integer.parseInt(year),
-                Integer.parseInt(month),
-                Integer.parseInt(day)
-            );
-
-            LocalTime holdingTime = LocalTime.of(
-                Integer.parseInt(hour),
-                Integer.parseInt(minute)
-            );
-
-            // 住所情報の取得
-            String postalCode = req.getParameter("postalCode");
-            String prefecture = req.getParameter("prefecture");
-            String city = req.getParameter("city");
-            String street = req.getParameter("street");
-            String building = req.getParameter("building");
-
-            // その他の情報
-            String maxCount = req.getParameter("maxcount");
-            String category = req.getParameter("category");
-            String phoneNumber = req.getParameter("phonenumber");
+        try {
+            // パラメータ取得
+            String eventName = req.getParameter("eventName");
+            String holdingDate = req.getParameter("holdingDate");
+            String holdingTime = req.getParameter("holdingTime");
+            String address = req.getParameter("address");
+            String maxCountStr = req.getParameter("maxCount");
+            String eventHoldState = req.getParameter("eventHoldState");
+            String phoneNumber = req.getParameter("phoneNumber");
             String link = req.getParameter("link");
-            String credit = req.getParameter("credit");
+            String eventOverview = req.getParameter("eventOverview");
+            String categoryId = req.getParameter("categoryId");
+            String mapInHall = req.getParameter("mapInHall");
+            String mapOutOfHall = req.getParameter("mapOutOfHall");
+            String ticketInfo = req.getParameter("ticketInfo");
 
-         // 画像ファイルの取得と保存
-            Part mapImagePart = req.getPart("eventMapImage");
-            Part innerMapImagePart = req.getPart("eventInnerMapImage");
+            System.out.println("イベント名: " + eventName);
+            System.out.println("主催者ID: " + user.getUser_id());
 
-            String mapImagePath = null;
-            String innerMapImagePath = null;
+            // バリデーション
+            if (eventName == null || eventName.trim().isEmpty() ||
+                holdingDate == null || holdingDate.trim().isEmpty() ||
+                holdingTime == null || holdingTime.trim().isEmpty() ||
+                address == null || address.trim().isEmpty() ||
+                maxCountStr == null || maxCountStr.trim().isEmpty() ||
+                eventOverview == null || eventOverview.trim().isEmpty()) {
 
-            // 会場マップ画像の処理
-            if (mapImagePart != null && mapImagePart.getSize() > 0) {
-                String mapFileName = fileDao.getFileName(mapImagePart);
-                mapImagePath = fileDao.saveUploadedFile(mapImagePart, mapFileName, req);
+                System.out.println("エラー：必須項目が入力されていません");
+                req.setAttribute("errorMessage", "必須項目が入力されていません。");
+                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
+                return;
             }
 
-            // 会場内マップ画像の処理
-            if (innerMapImagePart != null && innerMapImagePart.getSize() > 0) {
-                String innerMapFileName = fileDao.getFileName(innerMapImagePart);
-                innerMapImagePath = fileDao.saveUploadedFile(innerMapImagePart, innerMapFileName, req);
+            int maxCount = Integer.parseInt(maxCountStr);
+
+            if (maxCount < 1 || maxCount > 10000) {
+                req.setAttribute("errorMessage", "定員は1〜10000人の範囲で入力してください。");
+                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
+                return;
             }
 
-            LocalDate today = LocalDate.now();
+            // イベントID自動生成
+            String eventId = generateEventId();
+            System.out.println("生成されたイベントID: " + eventId);
 
-            System.out.println(mapImagePath);
-            System.out.println(innerMapImagePath);
-
-            String eventId = hosEvtDao.eventIdGet();
-
-            // セッターでEventクラスにデータを纏めていく
+            // Eventオブジェクト作成
+            Event event = new Event();
             event.setEventId(eventId);
-            event.setEventName(eventName);
-            event.setEventOverview(content);
-            event.setAddress(postalCode + prefecture + city + street + building);
-            event.setUserId(user.getUser_id());
-            event.setMapOutOfHall(mapImagePath);
-            event.setMapInHall(innerMapImagePath);
-            event.setEventAddDate(today);
-            event.setEventHoldState("1");
+            event.setEventName(eventName.trim());
             event.setHoldingDate(holdingDate);
             event.setHoldingTime(holdingTime);
-            event.setLink(link);
-            event.setMaxCount(Integer.parseInt(maxCount));
-            event.setPhoneNumber(phoneNumber);
+            event.setAddress(address.trim());
+            event.setMaxCount(maxCount);
+            event.setEventHoldState(eventHoldState != null ? eventHoldState : "1");
+            event.setPhoneNumber(phoneNumber != null ? phoneNumber.trim() : null);
+            event.setLink(link != null ? link.trim() : null);
+            event.setEventOverview(eventOverview.trim());
+            event.setHostId(user.getUser_id()); // ★重要：主催者IDを設定
+            event.setCategoryId(categoryId != null ? categoryId.trim() : null);
+            event.setMapInHall(mapInHall != null ? mapInHall.trim() : null);
+            event.setMapOutOfHall(mapOutOfHall != null ? mapOutOfHall.trim() : null);
+            event.setTicketInfo(ticketInfo != null ? ticketInfo.trim() : null);
+            event.setUserId(user.getUser_id());
+            event.setTotalPayment(0);
 
-            // チケットのシステムを作るまで一時的に適当に保存しておく
-            event.setTicketInfo(mapImagePath);
+            // データベース登録
+            EventDao eventDao = new EventDao();
+            int count = eventDao.save(event);
 
-            event.setCredit(credit);
+            if (count > 0) {
+                System.out.println("✓ イベント作成成功！");
+                session.setAttribute("successMessage", "イベントを作成しました。");
+                res.sendRedirect(req.getContextPath() + "/eventportal/host/HostMenu.action");
+            } else {
+                System.out.println("✗ イベント作成失敗");
+                req.setAttribute("errorMessage", "イベントの作成に失敗しました。");
+                req.setAttribute("event", event);
+                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
+            }
 
-            // INSERT処理を実行
-            hosEvtDao.eventCreate(event);
+        } catch (NumberFormatException e) {
+            System.err.println("数値変換エラー: " + e.getMessage());
+            req.setAttribute("errorMessage", "定員には数値を入力してください。");
+            req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
+        } catch (Exception e) {
+            System.err.println("イベント作成エラー: " + e.getMessage());
+            e.printStackTrace();
+            req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
+            req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
+        }
+    }
 
-            // カテゴリを登録
-            CatDao.categoryAdd(category);
-            String categoryId = CatDao.get(eventId);
-            CatDao.eventCategoryAdd(eventId , categoryId);
+    /**
+     * イベントID自動生成
+     * @return 新しいイベントID
+     * @throws Exception
+     */
+    private String generateEventId() throws Exception {
+        Dao dao = new Dao();
+        Connection connection = dao.getConnection();
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
 
-            // イベント作成後、作成完了ページに飛ぶ
-            req.getRequestDispatcher("event_create_done.jsp").forward(req, res);
+        try {
+            String sql = "SELECT event_id FROM EVENTS ORDER BY event_id DESC LIMIT 1";
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
 
+            int nextNumber = 1;
 
-	}
+            if (resultSet.next()) {
+                String lastEventId = resultSet.getString("event_id");
+                // EVT001 → 001 → 1 → 2 → 002 → EVT002
+                String numberPart = lastEventId.substring(3);
+                nextNumber = Integer.parseInt(numberPart) + 1;
+            }
 
+            return String.format("EVT%03d", nextNumber);
+
+        } finally {
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
+        }
+    }
 }

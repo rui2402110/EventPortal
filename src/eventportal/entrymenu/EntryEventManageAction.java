@@ -13,7 +13,7 @@ import dao.TicketDao;
 import tool.Action;
 
 /**
- * 参加イベント一覧表示アクション
+ * 参加イベント一覧表示アクション（完全版）
  */
 public class EntryEventManageAction extends Action {
     @Override
@@ -30,31 +30,48 @@ public class EntryEventManageAction extends Action {
         }
 
         System.out.println("ユーザーID: " + user.getUser_id());
+        System.out.println("ユーザー名: " + user.getUser_name());
 
         try {
             EventDao eventDao = new EventDao();
-            List<Event> list = eventDao.filter(null);
+            TicketDao ticketDao = new TicketDao();
 
+            // 全イベントを取得
+            List<Event> list = eventDao.filter(null);
             System.out.println("取得したイベント数: " + list.size());
 
-            TicketDao ticketDao = new TicketDao();
+            // 各イベントについてチケット所持状態をチェック
             for (Event event : list) {
                 boolean hasTicket = ticketDao.getByEventAndUser(event.getEventId(), user.getUser_id()) != null;
                 event.setHasTicket(hasTicket);
 
-                System.out.println("イベント: " + event.getEventId() +
+                System.out.println("  イベント: " + event.getEventId() +
                                  " (" + event.getEventName() + ") - " +
-                                 "チケット所持: " + (hasTicket ? "あり" : "なし"));
+                                 "チケット所持: " + (hasTicket ? "あり ✓" : "なし ✗"));
             }
 
+            // リクエストスコープに設定
             req.setAttribute("list", list);
 
+            // 成功メッセージがあれば表示
             String successMessage = (String) session.getAttribute("successMessage");
             if (successMessage != null) {
                 req.setAttribute("successMessage", successMessage);
                 session.removeAttribute("successMessage");
+                System.out.println("成功メッセージ: " + successMessage);
             }
 
+            // エラーメッセージがあれば表示
+            String errorMessage = (String) session.getAttribute("errorMessage");
+            if (errorMessage != null) {
+                req.setAttribute("errorMessage", errorMessage);
+                session.removeAttribute("errorMessage");
+                System.out.println("エラーメッセージ: " + errorMessage);
+            }
+
+            System.out.println("=== イベント一覧表示処理完了 ===");
+
+            // JSPにフォワード
             req.getRequestDispatcher("/eventportal/entry/entry_event_manage.jsp").forward(req, res);
 
         } catch (Exception e) {
