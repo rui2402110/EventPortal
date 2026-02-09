@@ -16,6 +16,8 @@
     イベントが作成できました
     </div>
 
+    <a href="${pageContext.request.contextPath}/eventportal/host/HostMenu.action">戻る</a>
+
     <div class="footer">@2025.................................................</div>
   </div>
 </body>

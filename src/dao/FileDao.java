@@ -39,6 +39,15 @@ public class FileDao extends Dao {
             return null;
         }
 
+        // ファイル名のスペースをアンダースコアに置換
+        fileName = fileName.replace(" ", "_");
+
+        // 日本語など特殊文字も英数字に変換する場合
+        // fileName = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+
+        // タイムスタンプを追加して一意にする
+        fileName = System.currentTimeMillis() + "_" + fileName;
+
         // WebContent/image フォルダの実際のパスを取得
         String uploadDir = req.getServletContext().getRealPath("/image");
         File uploadDirFile = new File(uploadDir);

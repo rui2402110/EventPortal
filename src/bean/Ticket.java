@@ -33,6 +33,11 @@ public class Ticket implements Serializable {
     /** 使用日時 */
     private Timestamp usedAt;
 
+    // ステータス定数
+    public static final int STATUS_VALID = 1;
+    public static final int STATUS_USED = 2;
+    public static final int STATUS_INVALID = 3;
+
     /**
      * デフォルトコンストラクタ
      */
@@ -57,169 +62,91 @@ public class Ticket implements Serializable {
 
     // ========== Getter / Setter ==========
 
-    /**
-     * チケットIDを取得
-     * @return チケットID
-     */
     public String getTicketId() {
         return ticketId;
     }
 
-    /**
-     * チケットIDを設定
-     * @param ticketId チケットID
-     */
     public void setTicketId(String ticketId) {
         this.ticketId = ticketId;
     }
 
-    /**
-     * イベントIDを取得
-     * @return イベントID
-     */
     public String getEventId() {
         return eventId;
     }
 
-    /**
-     * イベントIDを設定
-     * @param eventId イベントID
-     */
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
 
-    /**
-     * ユーザーIDを取得
-     * @return ユーザーID
-     */
     public String getUserId() {
         return userId;
     }
 
-    /**
-     * ユーザーIDを設定
-     * @param userId ユーザーID
-     */
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    /**
-     * 参加者名を取得
-     * @return 参加者名
-     */
     public String getParticipantName() {
         return participantName;
     }
 
-    /**
-     * 参加者名を設定
-     * @param participantName 参加者名
-     */
     public void setParticipantName(String participantName) {
         this.participantName = participantName;
     }
 
-    /**
-     * ステータスを取得
-     * @return ステータス (1:有効, 2:使用済み, 3:無効)
-     */
     public int getStatus() {
         return status;
     }
 
-    /**
-     * ステータスを設定
-     * @param status ステータス (1:有効, 2:使用済み, 3:無効)
-     */
     public void setStatus(int status) {
         this.status = status;
     }
 
-    /**
-     * QR画像データを取得
-     * @return QR画像データ (Base64エンコード)
-     */
     public String getQrImageData() {
         return qrImageData;
     }
 
-    /**
-     * QR画像データを設定
-     * @param qrImageData QR画像データ (Base64エンコード)
-     */
     public void setQrImageData(String qrImageData) {
         this.qrImageData = qrImageData;
     }
 
-    /**
-     * QR画像パスを取得
-     * @return QR画像パス
-     */
     public String getQrImagePath() {
         return qrImagePath;
     }
 
-    /**
-     * QR画像パスを設定
-     * @param qrImagePath QR画像パス
-     */
     public void setQrImagePath(String qrImagePath) {
         this.qrImagePath = qrImagePath;
     }
 
-    /**
-     * 使用日時を取得
-     * @return 使用日時
-     */
     public Timestamp getUsedAt() {
         return usedAt;
     }
 
-    /**
-     * 使用日時を設定
-     * @param usedAt 使用日時
-     */
     public void setUsedAt(Timestamp usedAt) {
         this.usedAt = usedAt;
     }
 
-    /**
-     * ステータスが有効かどうかを判定
-     * @return true:有効, false:無効
-     */
+    // ========== 便利メソッド ==========
+
     public boolean isValid() {
-        return status == 1;
+        return status == STATUS_VALID;
     }
 
-    /**
-     * ステータスが使用済みかどうかを判定
-     * @return true:使用済み, false:未使用
-     */
     public boolean isUsed() {
-        return status == 2;
+        return status == STATUS_USED;
     }
 
-    /**
-     * ステータスが無効かどうかを判定
-     * @return true:無効, false:有効
-     */
     public boolean isInvalid() {
-        return status == 3;
+        return status == STATUS_INVALID;
     }
 
-    /**
-     * ステータスを文字列で取得
-     * @return ステータス文字列
-     */
     public String getStatusString() {
         switch (status) {
-            case 1:
+            case STATUS_VALID:
                 return "有効";
-            case 2:
+            case STATUS_USED:
                 return "使用済み";
-            case 3:
+            case STATUS_INVALID:
                 return "無効";
             default:
                 return "不明";

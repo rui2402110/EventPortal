@@ -10,7 +10,7 @@ import java.util.List;
 import bean.Event;
 
 /**
- * イベントDAO
+ * イベントDAO（完全版）
  */
 public class EventDao extends Dao {
 
@@ -479,6 +479,8 @@ public class EventDao extends Dao {
      */
     private Event mapResultSetToEvent(ResultSet rs) throws SQLException {
         Event event = new Event();
+
+        // 必須フィールド（確実に存在する）
         event.setEventId(rs.getString("event_id"));
         event.setEventName(rs.getString("event_name"));
         event.setHoldingDate(rs.getString("holding_date"));
@@ -489,15 +491,39 @@ public class EventDao extends Dao {
         event.setPhoneNumber(rs.getString("phone_number"));
         event.setLink(rs.getString("link"));
         event.setEventOverview(rs.getString("event_overview"));
-        event.setHostId(rs.getString("host_id"));
 
-        // host_nameカラムがあれば取得（オプション）
+        // オプションフィールド（存在しない場合はスキップ）
+        event.setHostId(getStringOrNull(rs, "host_id"));
+        event.setHostName(getStringOrNull(rs, "host_name"));
+        event.setCategoryId(getStringOrNull(rs, "category_id"));
+        event.setCredit(getStringOrNull(rs, "credit"));
+        event.setEventAddDate(getStringOrNull(rs, "event_add_date"));
+        event.setMapInHall(getStringOrNull(rs, "map_in_hall"));
+        event.setMapOutOfHall(getStringOrNull(rs, "map_out_of_hall"));
+        event.setTicketInfo(getStringOrNull(rs, "ticket_info"));
+        event.setUserId(getStringOrNull(rs, "user_id"));
+
+        // INT型のオプションフィールド
         try {
-            event.setHostName(rs.getString("host_name"));
+            event.setTotalPayment(rs.getInt("total_payment"));
         } catch (SQLException e) {
-            // カラムがない場合は無視
+            event.setTotalPayment(0);
         }
 
         return event;
+    }
+
+    /**
+     * ResultSetから安全に文字列を取得
+     * @param rs ResultSet
+     * @param columnName カラム名
+     * @return 値（カラムが存在しない場合はnull）
+     */
+    private String getStringOrNull(ResultSet rs, String columnName) {
+        try {
+            return rs.getString(columnName);
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

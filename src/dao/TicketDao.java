@@ -28,7 +28,7 @@ public class TicketDao extends Dao {
         ResultSet resultSet = null;
 
         try {
-            String sql = "SELECT * FROM ticket WHERE ticket_id = ?";
+            String sql = "SELECT * FROM TICKET WHERE ticket_id = ?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, ticketId);
             resultSet = statement.executeQuery();
@@ -78,7 +78,7 @@ public class TicketDao extends Dao {
         ResultSet resultSet = null;
 
         try {
-            String sql = "SELECT * FROM ticket WHERE event_id = ? AND user_id = ?";
+            String sql = "SELECT * FROM TICKET WHERE event_id = ? AND user_id = ?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, eventId);
             statement.setString(2, userId);
@@ -128,7 +128,7 @@ public class TicketDao extends Dao {
         ResultSet resultSet = null;
 
         try {
-            String sql = "SELECT * FROM ticket WHERE event_id = ? ORDER BY ticket_id";
+            String sql = "SELECT * FROM TICKET WHERE event_id = ? ORDER BY ticket_id";
             statement = connection.prepareStatement(sql);
             statement.setString(1, eventId);
             resultSet = statement.executeQuery();
@@ -178,7 +178,7 @@ public class TicketDao extends Dao {
         ResultSet resultSet = null;
 
         try {
-            String sql = "SELECT * FROM ticket WHERE user_id = ? ORDER BY ticket_id";
+            String sql = "SELECT * FROM TICKET WHERE user_id = ? ORDER BY ticket_id";
             statement = connection.prepareStatement(sql);
             statement.setString(1, userId);
             resultSet = statement.executeQuery();
@@ -228,7 +228,7 @@ public class TicketDao extends Dao {
         ResultSet resultSet = null;
 
         try {
-            String sql = "SELECT COUNT(*) as count FROM ticket WHERE event_id = ? AND status = 2";
+            String sql = "SELECT COUNT(*) as count FROM TICKET WHERE event_id = ? AND status = 2";
             statement = connection.prepareStatement(sql);
             statement.setString(1, eventId);
             resultSet = statement.executeQuery();
@@ -276,7 +276,7 @@ public class TicketDao extends Dao {
         int count = 0;
 
         try {
-            String sql = "INSERT INTO ticket (ticket_id, event_id, user_id, participant_name, status, qr_image_data, qr_image_path, used_at) " +
+            String sql = "INSERT INTO TICKET (ticket_id, event_id, user_id, participant_name, status, qr_image_data, qr_image_path, used_at) " +
                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             statement = connection.prepareStatement(sql);
             statement.setString(1, ticket.getTicketId());
@@ -321,7 +321,7 @@ public class TicketDao extends Dao {
         int count = 0;
 
         try {
-            String sql = "UPDATE ticket SET event_id = ?, user_id = ?, participant_name = ?, " +
+            String sql = "UPDATE TICKET SET event_id = ?, user_id = ?, participant_name = ?, " +
                          "status = ?, qr_image_data = ?, qr_image_path = ?, used_at = ? " +
                          "WHERE ticket_id = ?";
             statement = connection.prepareStatement(sql);
@@ -369,7 +369,7 @@ public class TicketDao extends Dao {
         int count = 0;
 
         try {
-            String sql = "UPDATE ticket SET status = ?, used_at = ? WHERE ticket_id = ?";
+            String sql = "UPDATE TICKET SET status = ?, used_at = ? WHERE ticket_id = ?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, status);
             statement.setTimestamp(2, usedAt);
@@ -409,7 +409,7 @@ public class TicketDao extends Dao {
         int count = 0;
 
         try {
-            String sql = "UPDATE ticket SET qr_image_data = ? WHERE ticket_id = ?";
+            String sql = "UPDATE TICKET SET qr_image_data = ? WHERE ticket_id = ?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, qrImageData);
             statement.setString(2, ticketId);
@@ -447,7 +447,7 @@ public class TicketDao extends Dao {
         int count = 0;
 
         try {
-            String sql = "DELETE FROM ticket WHERE ticket_id = ?";
+            String sql = "DELETE FROM TICKET WHERE ticket_id = ?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, ticketId);
             count = statement.executeUpdate();
