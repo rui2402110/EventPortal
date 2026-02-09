@@ -10,7 +10,7 @@ import java.util.List;
 import bean.Event;
 
 /**
- * イベントDAO（完全版）
+ * イベントDAO（完全版・全カラム対応）
  */
 public class EventDao extends Dao {
 
@@ -185,7 +185,7 @@ public class EventDao extends Dao {
     }
 
     /**
-     * イベントを登録（全カラム対応版）
+     * イベントを登録（必須カラムのみ・シンプル版）
      * @param event イベント情報
      * @return 登録件数
      * @throws Exception
@@ -196,32 +196,22 @@ public class EventDao extends Dao {
         int count = 0;
 
         try {
-            String sql = "INSERT INTO EVENTS (event_id, event_name, holding_date, holding_time, " +
-                         "address, max_count, event_hold_state, phone_number, link, event_overview, " +
-                         "host_id, category_id, credit, event_add_date, map_in_hall, map_out_of_hall, " +
-                         "ticket_info, user_id, total_payment) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            // 必須カラムのみ指定（NULLを許容するカラムは省略）
+            String sql = "INSERT INTO EVENTS (" +
+                         "event_id, event_name, event_overview, holding_date, holding_time, " +
+                         "address, max_count, event_hold_state, host_id" +
+                         ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             statement = connection.prepareStatement(sql);
             statement.setString(1, event.getEventId());
             statement.setString(2, event.getEventName());
-            statement.setString(3, event.getHoldingDate());
-            statement.setString(4, event.getHoldingTime());
-            statement.setString(5, event.getAddress());
-            statement.setInt(6, event.getMaxCount());
-            statement.setString(7, event.getEventHoldState() != null ? event.getEventHoldState() : "1");
-            statement.setString(8, event.getPhoneNumber());
-            statement.setString(9, event.getLink());
-            statement.setString(10, event.getEventOverview());
-            statement.setString(11, event.getHostId());
-            statement.setString(12, event.getCategoryId());
-            statement.setString(13, event.getCredit());
-            statement.setString(14, event.getEventAddDate());
-            statement.setString(15, event.getMapInHall());
-            statement.setString(16, event.getMapOutOfHall());
-            statement.setString(17, event.getTicketInfo());
-            statement.setString(18, event.getUserId());
-            statement.setInt(19, event.getTotalPayment());
+            statement.setString(3, event.getEventOverview());
+            statement.setString(4, event.getHoldingDate());
+            statement.setString(5, event.getHoldingTime());
+            statement.setString(6, event.getAddress());
+            statement.setInt(7, event.getMaxCount());
+            statement.setString(8, event.getEventHoldState() != null ? event.getEventHoldState() : "1");
+            statement.setString(9, event.getHostId());
 
             count = statement.executeUpdate();
 
@@ -229,6 +219,7 @@ public class EventDao extends Dao {
 
         } catch (Exception e) {
             System.err.println("✗ イベント登録エラー: " + e.getMessage());
+            System.err.println("SQL実行時エラー詳細:");
             e.printStackTrace();
             throw e;
         } finally {
