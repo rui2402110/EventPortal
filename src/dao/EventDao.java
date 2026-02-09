@@ -1,24 +1,23 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
 import bean.Event;
 
 /**
- * イベントDAO（完全版・全カラム対応）
+ * イベントDAO（TIME/DATE型対応完全版）
  */
 public class EventDao extends Dao {
 
     /**
      * イベントIDでイベントを取得
-     * @param eventId イベントID
-     * @return イベント情報（見つからない場合はnull）
-     * @throws Exception
      */
     public Event get(String eventId) throws Exception {
         Event event = null;
@@ -35,30 +34,10 @@ public class EventDao extends Dao {
             if (resultSet.next()) {
                 event = mapResultSetToEvent(resultSet);
             }
-        } catch (Exception e) {
-            throw e;
         } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
 
         return event;
@@ -66,8 +45,6 @@ public class EventDao extends Dao {
 
     /**
      * 全イベントを取得
-     * @return イベントリスト
-     * @throws Exception
      */
     public List<Event> getAll() throws Exception {
         return filter(null);
@@ -75,9 +52,6 @@ public class EventDao extends Dao {
 
     /**
      * イベントをフィルタ条件で取得
-     * @param school 学校（nullの場合は全件取得）
-     * @return イベントリスト
-     * @throws Exception
      */
     public List<Event> filter(String school) throws Exception {
         List<Event> eventList = new ArrayList<>();
@@ -88,11 +62,9 @@ public class EventDao extends Dao {
         try {
             String sql;
             if (school == null) {
-                // 全件取得
                 sql = "SELECT * FROM EVENTS ORDER BY holding_date DESC, event_id";
                 statement = connection.prepareStatement(sql);
             } else {
-                // 学校でフィルタ
                 sql = "SELECT * FROM EVENTS WHERE school = ? ORDER BY holding_date DESC, event_id";
                 statement = connection.prepareStatement(sql);
                 statement.setString(1, school);
@@ -104,30 +76,10 @@ public class EventDao extends Dao {
                 Event event = mapResultSetToEvent(resultSet);
                 eventList.add(event);
             }
-        } catch (Exception e) {
-            throw e;
         } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
 
         return eventList;
@@ -135,9 +87,6 @@ public class EventDao extends Dao {
 
     /**
      * 主催者IDでイベントを取得
-     * @param hostId 主催者ID
-     * @return イベントリスト
-     * @throws Exception
      */
     public List<Event> getByHostId(String hostId) throws Exception {
         List<Event> eventList = new ArrayList<>();
@@ -155,88 +104,89 @@ public class EventDao extends Dao {
                 Event event = mapResultSetToEvent(resultSet);
                 eventList.add(event);
             }
-        } catch (Exception e) {
-            throw e;
         } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
 
         return eventList;
     }
 
     /**
-     * イベントを登録（必須カラムのみ・シンプル版）
-     * @param event イベント情報
-     * @return 登録件数
-     * @throws Exception
+     * イベントを登録（TIME/DATE型対応版）
      */
     public int save(Event event) throws Exception {
+        System.out.println("\n  ┌─────────────────────────────────────────┐");
+        System.out.println("  │   EventDao.save() メソッド開始          │");
+        System.out.println("  └─────────────────────────────────────────┘");
+
         Connection connection = getConnection();
         PreparedStatement statement = null;
         int count = 0;
 
         try {
-            // 必須カラムのみ指定（NULLを許容するカラムは省略）
             String sql = "INSERT INTO EVENTS (" +
                          "event_id, event_name, event_overview, holding_date, holding_time, " +
                          "address, max_count, event_hold_state, host_id" +
                          ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+            System.out.println("    SQL: " + sql);
+
             statement = connection.prepareStatement(sql);
+
+            // 1. event_id
             statement.setString(1, event.getEventId());
+            System.out.println("    1. event_id = " + event.getEventId());
+
+            // 2. event_name
             statement.setString(2, event.getEventName());
+            System.out.println("    2. event_name = " + event.getEventName());
+
+            // 3. event_overview
             statement.setString(3, event.getEventOverview());
-            statement.setString(4, event.getHoldingDate());
-            statement.setString(5, event.getHoldingTime());
+            System.out.println("    3. event_overview = " + event.getEventOverview().substring(0, Math.min(30, event.getEventOverview().length())) + "...");
+
+            // 4. holding_date (DATE型)
+            Date sqlDate = Date.valueOf(event.getHoldingDate());
+            statement.setDate(4, sqlDate);
+            System.out.println("    4. holding_date = " + event.getHoldingDate() + " → " + sqlDate);
+
+            // 5. holding_time (TIME型) ★重要
+            Time sqlTime = Time.valueOf(event.getHoldingTime() + ":00");
+            statement.setTime(5, sqlTime);
+            System.out.println("    5. holding_time = " + event.getHoldingTime() + " → " + sqlTime);
+
+            // 6. address
             statement.setString(6, event.getAddress());
+            System.out.println("    6. address = " + event.getAddress());
+
+            // 7. max_count
             statement.setInt(7, event.getMaxCount());
+            System.out.println("    7. max_count = " + event.getMaxCount());
+
+            // 8. event_hold_state
             statement.setString(8, event.getEventHoldState() != null ? event.getEventHoldState() : "1");
+            System.out.println("    8. event_hold_state = " + (event.getEventHoldState() != null ? event.getEventHoldState() : "1"));
+
+            // 9. host_id
             statement.setString(9, event.getHostId());
+            System.out.println("    9. host_id = " + event.getHostId());
 
+            System.out.println("\n    → executeUpdate() 実行中...");
             count = statement.executeUpdate();
+            System.out.println("    ← executeUpdate() 完了: " + count + "件");
 
-            System.out.println("✓ イベント登録成功: " + event.getEventId() + " - " + event.getEventName());
+            System.out.println("\n  ✓ イベント登録成功！");
 
         } catch (Exception e) {
-            System.err.println("✗ イベント登録エラー: " + e.getMessage());
-            System.err.println("SQL実行時エラー詳細:");
+            System.err.println("\n  ✗✗✗ EventDao.save() エラー ✗✗✗");
+            System.err.println("    " + e.getClass().getName() + ": " + e.getMessage());
             e.printStackTrace();
             throw e;
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
 
         return count;
@@ -244,9 +194,6 @@ public class EventDao extends Dao {
 
     /**
      * イベント情報を更新
-     * @param event イベント情報
-     * @return 更新件数
-     * @throws Exception
      */
     public int update(Event event) throws Exception {
         Connection connection = getConnection();
@@ -256,41 +203,22 @@ public class EventDao extends Dao {
         try {
             String sql = "UPDATE EVENTS SET event_name = ?, holding_date = ?, holding_time = ?, " +
                          "address = ?, max_count = ?, event_hold_state = ?, phone_number = ?, " +
-                         "link = ?, event_overview = ?, category_id = ?, map_in_hall = ?, " +
-                         "map_out_of_hall = ?, ticket_info = ? WHERE event_id = ?";
+                         "link = ?, event_overview = ? WHERE event_id = ?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, event.getEventName());
-            statement.setString(2, event.getHoldingDate());
-            statement.setString(3, event.getHoldingTime());
+            statement.setDate(2, Date.valueOf(event.getHoldingDate()));
+            statement.setTime(3, Time.valueOf(event.getHoldingTime() + ":00"));
             statement.setString(4, event.getAddress());
             statement.setInt(5, event.getMaxCount());
             statement.setString(6, event.getEventHoldState());
             statement.setString(7, event.getPhoneNumber());
             statement.setString(8, event.getLink());
             statement.setString(9, event.getEventOverview());
-            statement.setString(10, event.getCategoryId());
-            statement.setString(11, event.getMapInHall());
-            statement.setString(12, event.getMapOutOfHall());
-            statement.setString(13, event.getTicketInfo());
-            statement.setString(14, event.getEventId());
+            statement.setString(10, event.getEventId());
             count = statement.executeUpdate();
-        } catch (Exception e) {
-            throw e;
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
 
         return count;
@@ -298,9 +226,6 @@ public class EventDao extends Dao {
 
     /**
      * イベントを削除
-     * @param eventId イベントID
-     * @return 削除件数
-     * @throws Exception
      */
     public int delete(String eventId) throws Exception {
         Connection connection = getConnection();
@@ -312,225 +237,52 @@ public class EventDao extends Dao {
             statement = connection.prepareStatement(sql);
             statement.setString(1, eventId);
             count = statement.executeUpdate();
-        } catch (Exception e) {
-            throw e;
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
 
         return count;
-    }
-
-    /**
-     * イベント件数を取得
-     * @return イベント件数
-     * @throws Exception
-     */
-    public int count() throws Exception {
-        Connection connection = getConnection();
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        int count = 0;
-
-        try {
-            String sql = "SELECT COUNT(*) as cnt FROM EVENTS";
-            statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                count = resultSet.getInt("cnt");
-            }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-        }
-
-        return count;
-    }
-
-    /**
-     * イベント状態で検索
-     * @param eventHoldState イベント開催状態（1:開催前, 2:開催中, 3:開催後）
-     * @return イベントリスト
-     * @throws Exception
-     */
-    public List<Event> getByState(String eventHoldState) throws Exception {
-        List<Event> eventList = new ArrayList<>();
-        Connection connection = getConnection();
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            String sql = "SELECT * FROM EVENTS WHERE event_hold_state = ? ORDER BY holding_date DESC";
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, eventHoldState);
-            resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Event event = mapResultSetToEvent(resultSet);
-                eventList.add(event);
-            }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-        }
-
-        return eventList;
-    }
-
-    /**
-     * イベント名で検索（部分一致）
-     * @param keyword キーワード
-     * @return イベントリスト
-     * @throws Exception
-     */
-    public List<Event> searchByName(String keyword) throws Exception {
-        List<Event> eventList = new ArrayList<>();
-        Connection connection = getConnection();
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            String sql = "SELECT * FROM EVENTS WHERE event_name LIKE ? ORDER BY holding_date DESC";
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, "%" + keyword + "%");
-            resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                Event event = mapResultSetToEvent(resultSet);
-                eventList.add(event);
-            }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
-            }
-        }
-
-        return eventList;
     }
 
     /**
      * ResultSetからEventオブジェクトにマッピング
-     * @param rs ResultSet
-     * @return Eventオブジェクト
-     * @throws SQLException
      */
     private Event mapResultSetToEvent(ResultSet rs) throws SQLException {
         Event event = new Event();
 
-        // 必須フィールド（確実に存在する）
         event.setEventId(rs.getString("event_id"));
         event.setEventName(rs.getString("event_name"));
-        event.setHoldingDate(rs.getString("holding_date"));
-        event.setHoldingTime(rs.getString("holding_time"));
+
+        // DATE型からStringに変換
+        Date holdingDate = rs.getDate("holding_date");
+        if (holdingDate != null) {
+            event.setHoldingDate(holdingDate.toString());
+        }
+
+        // TIME型からStringに変換（HH:mm形式）
+        Time holdingTime = rs.getTime("holding_time");
+        if (holdingTime != null) {
+            event.setHoldingTime(holdingTime.toString().substring(0, 5));
+        }
+
         event.setAddress(rs.getString("address"));
         event.setMaxCount(rs.getInt("max_count"));
         event.setEventHoldState(rs.getString("event_hold_state"));
         event.setPhoneNumber(rs.getString("phone_number"));
         event.setLink(rs.getString("link"));
         event.setEventOverview(rs.getString("event_overview"));
-
-        // オプションフィールド（存在しない場合はスキップ）
         event.setHostId(getStringOrNull(rs, "host_id"));
         event.setHostName(getStringOrNull(rs, "host_name"));
         event.setCategoryId(getStringOrNull(rs, "category_id"));
-        event.setCredit(getStringOrNull(rs, "credit"));
-        event.setEventAddDate(getStringOrNull(rs, "event_add_date"));
         event.setMapInHall(getStringOrNull(rs, "map_in_hall"));
         event.setMapOutOfHall(getStringOrNull(rs, "map_out_of_hall"));
-        event.setTicketInfo(getStringOrNull(rs, "ticket_info"));
-        event.setUserId(getStringOrNull(rs, "user_id"));
-
-        // INT型のオプションフィールド
-        try {
-            event.setTotalPayment(rs.getInt("total_payment"));
-        } catch (SQLException e) {
-            event.setTotalPayment(0);
-        }
 
         return event;
     }
 
     /**
      * ResultSetから安全に文字列を取得
-     * @param rs ResultSet
-     * @param columnName カラム名
-     * @return 値（カラムが存在しない場合はnull）
      */
     private String getStringOrNull(ResultSet rs, String columnName) {
         try {

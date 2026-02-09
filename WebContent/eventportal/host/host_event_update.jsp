@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>イベント更新 | イベントポータル</title>
+    <title>イベント編集 | イベントポータル</title>
     <style>
         * {
             margin: 0;
@@ -68,6 +68,7 @@
         .form-group input[type="number"],
         .form-group input[type="tel"],
         .form-group input[type="url"],
+        .form-group input[type="file"],
         .form-group textarea,
         .form-group select {
             width: 100%;
@@ -91,6 +92,43 @@
             min-height: 120px;
         }
 
+        .form-group input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .current-image {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .current-image img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .current-image p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -104,15 +142,6 @@
             border-radius: 8px;
             margin-bottom: 20px;
             border-left: 4px solid #c33;
-        }
-
-        .success-message {
-            background: #efe;
-            color: #3c3;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #3c3;
         }
 
         .button-group {
@@ -178,7 +207,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📝 イベント更新</h1>
+            <h1>✏️ イベント編集</h1>
             <p>イベント情報を編集してください</p>
         </div>
 
@@ -188,17 +217,12 @@
             </div>
         </c:if>
 
-        <c:if test="${not empty successMessage}">
-            <div class="success-message">
-                ✓ ${successMessage}
-            </div>
-        </c:if>
-
         <form action="${pageContext.request.contextPath}/eventportal/host/EventUpdateExecute.action"
               method="post"
+              enctype="multipart/form-data"
               onsubmit="return validateForm()">
 
-            <!-- イベントID（非表示） -->
+            <!-- イベントID（hidden） -->
             <input type="hidden" name="eventId" value="${event.eventId}">
 
             <!-- イベント名 -->
@@ -211,8 +235,7 @@
                        name="eventName"
                        value="${event.eventName}"
                        required
-                       maxlength="100"
-                       placeholder="例: 春の音楽フェスティバル">
+                       maxlength="100">
             </div>
 
             <!-- 開催日時 -->
@@ -249,8 +272,7 @@
                        name="address"
                        value="${event.address}"
                        required
-                       maxlength="200"
-                       placeholder="例: 東京都渋谷区○○ホール">
+                       maxlength="200">
             </div>
 
             <!-- 定員と開催状態 -->
@@ -265,8 +287,7 @@
                            value="${event.maxCount}"
                            required
                            min="1"
-                           max="10000"
-                           placeholder="例: 100">
+                           max="10000">
                     <div class="help-text">1〜10000人の範囲で指定</div>
                 </div>
                 <div class="form-group">
@@ -290,8 +311,7 @@
                        id="phoneNumber"
                        name="phoneNumber"
                        value="${event.phoneNumber}"
-                       maxlength="15"
-                       placeholder="例: 03-1234-5678">
+                       maxlength="15">
             </div>
 
             <!-- リンク -->
@@ -303,8 +323,7 @@
                        id="link"
                        name="link"
                        value="${event.link}"
-                       maxlength="500"
-                       placeholder="例: https://example.com">
+                       maxlength="500">
             </div>
 
             <!-- イベント概要 -->
@@ -315,9 +334,53 @@
                 <textarea id="eventOverview"
                           name="eventOverview"
                           required
-                          maxlength="1000"
-                          placeholder="イベントの詳細を入力してください">${event.eventOverview}</textarea>
+                          maxlength="1000">${event.eventOverview}</textarea>
                 <div class="help-text">最大1000文字</div>
+            </div>
+
+            <!-- 会場マップ（画像アップロード） -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mapInHall">
+                        🗺️ 会場内マップ
+                    </label>
+
+                    <c:if test="${not empty event.mapInHall}">
+                        <div class="current-image">
+                            <p>📎 現在の画像:</p>
+                            <img src="${pageContext.request.contextPath}/${event.mapInHall}" alt="会場内マップ">
+                        </div>
+                    </c:if>
+
+                    <input type="file"
+                           id="mapInHall"
+                           name="mapInHall"
+                           accept="image/*"
+                           onchange="previewImage(this, 'previewInHall')">
+                    <div class="help-text">新しい画像を選択すると置き換えられます（PNG, JPG, 最大5MB）</div>
+                    <div id="previewInHall" class="image-preview"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mapOutOfHall">
+                        🗺️ 会場外マップ
+                    </label>
+
+                    <c:if test="${not empty event.mapOutOfHall}">
+                        <div class="current-image">
+                            <p>📎 現在の画像:</p>
+                            <img src="${pageContext.request.contextPath}/${event.mapOutOfHall}" alt="会場外マップ">
+                        </div>
+                    </c:if>
+
+                    <input type="file"
+                           id="mapOutOfHall"
+                           name="mapOutOfHall"
+                           accept="image/*"
+                           onchange="previewImage(this, 'previewOutOfHall')">
+                    <div class="help-text">新しい画像を選択すると置き換えられます（PNG, JPG, 最大5MB）</div>
+                    <div id="previewOutOfHall" class="image-preview"></div>
+                </div>
             </div>
 
             <!-- カテゴリID（オプション） -->
@@ -329,45 +392,7 @@
                        id="categoryId"
                        name="categoryId"
                        value="${event.categoryId}"
-                       maxlength="50"
-                       placeholder="例: music, sports">
-            </div>
-
-            <!-- 会場マップURL（オプション） -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="mapInHall">
-                        会場内マップURL
-                    </label>
-                    <input type="url"
-                           id="mapInHall"
-                           name="mapInHall"
-                           value="${event.mapInHall}"
-                           maxlength="500"
-                           placeholder="https://...">
-                </div>
-                <div class="form-group">
-                    <label for="mapOutOfHall">
-                        会場外マップURL
-                    </label>
-                    <input type="url"
-                           id="mapOutOfHall"
-                           name="mapOutOfHall"
-                           value="${event.mapOutOfHall}"
-                           maxlength="500"
-                           placeholder="https://...">
-                </div>
-            </div>
-
-            <!-- チケット情報（オプション） -->
-            <div class="form-group">
-                <label for="ticketInfo">
-                    チケット情報
-                </label>
-                <textarea id="ticketInfo"
-                          name="ticketInfo"
-                          maxlength="500"
-                          placeholder="チケットの購入方法や価格などを入力">${event.ticketInfo}</textarea>
+                       maxlength="50">
             </div>
 
             <!-- ボタングループ -->
@@ -384,7 +409,49 @@
     </div>
 
     <script>
+        console.log("=== host_event_update.jsp 読み込み完了 ===");
+
+        // 画像プレビュー機能
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // ファイルサイズチェック（5MB）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('ファイルサイズが大きすぎます。5MB以下のファイルを選択してください。');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+
+                // 画像形式チェック
+                if (!file.type.match('image.*')) {
+                    alert('画像ファイルを選択してください。');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.innerHTML = '<p style="font-size:12px;color:#2ecc71;margin-bottom:5px;">✓ 新しい画像プレビュー:</p><img src="' + e.target.result + '" alt="プレビュー">';
+                    preview.style.display = 'block';
+                };
+
+                reader.readAsDataURL(file);
+
+                console.log('画像選択:', file.name, 'サイズ:', (file.size / 1024).toFixed(2) + 'KB');
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
         function validateForm() {
+            console.log('=== フォームバリデーション開始 ===');
+
             const eventName = document.getElementById('eventName').value.trim();
             const holdingDate = document.getElementById('holdingDate').value;
             const holdingTime = document.getElementById('holdingTime').value;
@@ -392,37 +459,18 @@
             const maxCount = document.getElementById('maxCount').value;
             const eventOverview = document.getElementById('eventOverview').value.trim();
 
-            if (!eventName) {
-                alert('イベント名を入力してください');
+            if (!eventName || !holdingDate || !holdingTime || !address || !maxCount || !eventOverview) {
+                alert('必須項目を入力してください');
                 return false;
             }
 
-            if (!holdingDate) {
-                alert('開催日を選択してください');
-                return false;
-            }
-
-            if (!holdingTime) {
-                alert('開催時刻を選択してください');
-                return false;
-            }
-
-            if (!address) {
-                alert('開催場所を入力してください');
-                return false;
-            }
-
-            if (!maxCount || maxCount < 1 || maxCount > 10000) {
+            if (maxCount < 1 || maxCount > 10000) {
                 alert('定員は1〜10000人の範囲で入力してください');
                 return false;
             }
 
-            if (!eventOverview) {
-                alert('イベント概要を入力してください');
-                return false;
-            }
-
-            return confirm('この内容でイベント情報を更新しますか？');
+            console.log('✓ バリデーションOK');
+            return confirm('この内容でイベントを更新しますか？');
         }
     </script>
 </body>

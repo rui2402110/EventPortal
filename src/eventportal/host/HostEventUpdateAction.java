@@ -7,16 +7,15 @@ import javax.servlet.http.HttpSession;
 import bean.Event;
 import bean.User;
 import dao.EventDao;
-import dao.TicketDao;
 import tool.Action;
 
 /**
- * QRスキャン画面表示アクション（完全版）
+ * イベント更新画面表示アクション
  */
-public class HostQRScannerAction extends Action {
+public class HostEventUpdateAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        System.out.println("=== QRスキャン画面表示処理開始 ===");
+        System.out.println("=== イベント更新画面表示 ===");
 
         HttpSession session = req.getSession(false);
         User user = (User) session.getAttribute("user");
@@ -28,6 +27,7 @@ public class HostQRScannerAction extends Action {
         }
 
         String eventId = req.getParameter("eventId");
+
         if (eventId == null || eventId.isEmpty()) {
             System.out.println("エラー：イベントIDが指定されていません");
             req.setAttribute("errorMessage", "イベントIDが指定されていません。");
@@ -36,7 +36,6 @@ public class HostQRScannerAction extends Action {
         }
 
         System.out.println("イベントID: " + eventId);
-        System.out.println("主催者ID: " + user.getUser_id());
 
         try {
             EventDao eventDao = new EventDao();
@@ -49,33 +48,22 @@ public class HostQRScannerAction extends Action {
                 return;
             }
 
-            // 権限チェック：自分のイベントか確認
+            // 権限チェック
             if (!event.getHostId().equals(user.getUser_id())) {
                 System.out.println("エラー：このイベントの主催者ではありません");
-                req.setAttribute("errorMessage", "このイベントのQRスキャンを行う権限がありません。");
+                req.setAttribute("errorMessage", "このイベントを編集する権限がありません。");
                 req.getRequestDispatcher("/error.jsp").forward(req, res);
                 return;
             }
 
             System.out.println("イベント名: " + event.getEventName());
-
-            // 入場者数を取得
-            TicketDao ticketDao = new TicketDao();
-            int admittedCount = ticketDao.getAdmittedCount(eventId);
-            int totalTickets = ticketDao.getByEventId(eventId).size();
-
-            System.out.println("入場者数: " + admittedCount + " / " + totalTickets);
+            System.out.println("✓ 権限チェックOK");
 
             req.setAttribute("event", event);
-            req.setAttribute("admittedCount", admittedCount);
-            req.setAttribute("totalTickets", totalTickets);
-
-            System.out.println("=== QRスキャン画面表示処理完了 ===");
-
-            req.getRequestDispatcher("/eventportal/qr/host_qr_scanner.jsp").forward(req, res);
+            req.getRequestDispatcher("/eventportal/host/host_event_update.jsp").forward(req, res);
 
         } catch (Exception e) {
-            System.err.println("QRスキャン画面表示エラー: " + e.getMessage());
+            System.err.println("イベント更新画面表示エラー: " + e.getMessage());
             e.printStackTrace();
             req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
             req.getRequestDispatcher("/error.jsp").forward(req, res);

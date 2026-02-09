@@ -20,6 +20,62 @@
             padding: 20px;
         }
 
+        .header-wrapper {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+        }
+
+        .header-bar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-bar h1 {
+            color: #667eea;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+        }
+
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -34,7 +90,7 @@
             margin-bottom: 40px;
         }
 
-        .header h1 {
+        .header h2 {
             color: #333;
             font-size: 32px;
             margin-bottom: 10px;
@@ -68,6 +124,7 @@
         .form-group input[type="number"],
         .form-group input[type="tel"],
         .form-group input[type="url"],
+        .form-group input[type="file"],
         .form-group textarea,
         .form-group select {
             width: 100%;
@@ -89,6 +146,23 @@
         .form-group textarea {
             resize: vertical;
             min-height: 120px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
         }
 
         .form-row {
@@ -152,6 +226,22 @@
         }
 
         @media (max-width: 768px) {
+            .header-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn-back,
+            .btn-logout {
+                width: 100%;
+                text-align: center;
+            }
+
             .container {
                 padding: 20px;
             }
@@ -167,9 +257,27 @@
     </style>
 </head>
 <body>
+    <!-- ヘッダーバー -->
+    <div class="header-wrapper">
+        <div class="header-bar">
+            <h1>🎪 イベントポータル - 主催者</h1>
+            <div class="header-buttons">
+                <a href="${pageContext.request.contextPath}/eventportal/host/HostMenu.action"
+                   class="btn-back">
+                    ← 戻る
+                </a>
+                <a href="${pageContext.request.contextPath}/eventportal/auth/Logout.action"
+                   class="btn-logout"
+                   onclick="return confirm('ログアウトしますか？');">
+                    🚪 ログアウト
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
-            <h1>✨ イベント作成</h1>
+            <h2>✨ イベント作成</h2>
             <p>新しいイベントを作成してください</p>
         </div>
 
@@ -181,6 +289,7 @@
 
         <form action="${pageContext.request.contextPath}/eventportal/host/HostEventCreateExecute.action"
               method="post"
+              enctype="multipart/form-data"
               onsubmit="return validateForm()">
 
             <!-- イベント名 -->
@@ -295,6 +404,34 @@
                 <div class="help-text">最大1000文字</div>
             </div>
 
+            <!-- 会場マップ（画像アップロード） -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mapInHall">
+                        🗺️ 会場内マップ
+                    </label>
+                    <input type="file"
+                           id="mapInHall"
+                           name="mapInHall"
+                           accept="image/*"
+                           onchange="previewImage(this, 'previewInHall')">
+                    <div class="help-text">PNG, JPG, JPEG形式（最大5MB）</div>
+                    <div id="previewInHall" class="image-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="mapOutOfHall">
+                        🗺️ 会場外マップ
+                    </label>
+                    <input type="file"
+                           id="mapOutOfHall"
+                           name="mapOutOfHall"
+                           accept="image/*"
+                           onchange="previewImage(this, 'previewOutOfHall')">
+                    <div class="help-text">PNG, JPG, JPEG形式（最大5MB）</div>
+                    <div id="previewOutOfHall" class="image-preview"></div>
+                </div>
+            </div>
+
             <!-- カテゴリID（オプション） -->
             <div class="form-group">
                 <label for="categoryId">
@@ -323,8 +460,46 @@
     <script>
         console.log("=== host_event_create.jsp 読み込み完了 ===");
 
+        // 画像プレビュー機能
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // ファイルサイズチェック（5MB）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('ファイルサイズが大きすぎます。5MB以下のファイルを選択してください。');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+
+                // 画像形式チェック
+                if (!file.type.match('image.*')) {
+                    alert('画像ファイルを選択してください。');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="プレビュー">';
+                    preview.style.display = 'block';
+                };
+
+                reader.readAsDataURL(file);
+
+                console.log('画像選択:', file.name, 'サイズ:', (file.size / 1024).toFixed(2) + 'KB');
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
         function validateForm() {
-            console.log("=== フォームバリデーション開始 ===");
+            console.log('=== フォームバリデーション開始 ===');
 
             const eventName = document.getElementById('eventName').value.trim();
             const holdingDate = document.getElementById('holdingDate').value;
@@ -333,40 +508,13 @@
             const maxCount = document.getElementById('maxCount').value;
             const eventOverview = document.getElementById('eventOverview').value.trim();
 
-            console.log('イベント名:', eventName);
-            console.log('開催日:', holdingDate);
-            console.log('開催時刻:', holdingTime);
-            console.log('住所:', address);
-            console.log('定員:', maxCount);
-            console.log('概要:', eventOverview);
-
-            if (!eventName) {
-                alert('イベント名を入力してください');
+            if (!eventName || !holdingDate || !holdingTime || !address || !maxCount || !eventOverview) {
+                alert('必須項目を入力してください');
                 return false;
             }
 
-            if (!holdingDate) {
-                alert('開催日を選択してください');
-                return false;
-            }
-
-            if (!holdingTime) {
-                alert('開催時刻を選択してください');
-                return false;
-            }
-
-            if (!address) {
-                alert('開催場所を入力してください');
-                return false;
-            }
-
-            if (!maxCount || maxCount < 1 || maxCount > 10000) {
+            if (maxCount < 1 || maxCount > 10000) {
                 alert('定員は1〜10000人の範囲で入力してください');
-                return false;
-            }
-
-            if (!eventOverview) {
-                alert('イベント概要を入力してください');
                 return false;
             }
 
@@ -379,7 +527,6 @@
             const dateInput = document.getElementById('holdingDate');
             const today = new Date().toISOString().split('T')[0];
             dateInput.setAttribute('min', today);
-            console.log('最小日付設定:', today);
         });
     </script>
 </body>

@@ -1,12 +1,19 @@
 package eventportal.host;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import bean.Event;
 import bean.User;
@@ -15,52 +22,34 @@ import dao.EventDao;
 import tool.Action;
 
 /**
- * イベント作成実行アクション（超詳細ログ版）
+ * イベント作成実行アクション（画像アップロード対応版）
  */
 public class HostEventCreateExecuteAction extends Action {
+
+    // 画像保存ディレクトリ（Webアプリケーションのルートからの相対パス）
+    private static final String UPLOAD_DIR = "uploads/maps";
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        System.out.println("\n\n");
-        System.out.println("████████████████████████████████████████████████████████████████");
-        System.out.println("███                                                          ███");
-        System.out.println("███          イベント作成処理開始                            ███");
-        System.out.println("███                                                          ███");
+        System.out.println("\n████████████████████████████████████████████████████████████████");
+        System.out.println("███          イベント作成処理開始（画像対応）                ███");
         System.out.println("████████████████████████████████████████████████████████████████");
         System.out.println();
 
         HttpSession session = req.getSession(false);
-
-        System.out.println("【STEP 1】セッション取得");
-        if (session == null) {
-            System.out.println("  ✗ セッションがnull");
-            res.sendRedirect(req.getContextPath() + "/eventportal/auth/HostLogin.action");
-            return;
-        }
-        System.out.println("  ✓ セッション取得成功");
-
         User user = (User) session.getAttribute("user");
 
-        System.out.println("\n【STEP 2】ユーザー認証");
-        if (user == null) {
-            System.out.println("  ✗ ユーザーがnull（未ログイン）");
+        if (user == null || user.getUser_type() != 2) {
+            System.out.println("✗ エラー：未ログインまたは権限なし");
             res.sendRedirect(req.getContextPath() + "/eventportal/auth/HostLogin.action");
             return;
         }
-        System.out.println("  ✓ ユーザー取得成功");
-        System.out.println("    - ユーザーID: " + user.getUser_id());
-        System.out.println("    - ユーザー名: " + user.getUser_name());
-        System.out.println("    - ユーザー種別: " + user.getUser_type());
 
-        if (user.getUser_type() != 2) {
-            System.out.println("  ✗ ユーザー種別エラー（user_type=" + user.getUser_type() + "）");
-            System.out.println("    主催者ではありません（2以外）");
-            res.sendRedirect(req.getContextPath() + "/eventportal/auth/HostLogin.action");
-            return;
-        }
-        System.out.println("  ✓ 主催者権限確認OK");
+        System.out.println("✓ ユーザー認証OK: " + user.getUser_id());
 
         try {
-            System.out.println("\n【STEP 3】パラメータ取得");
+            // パラメータ取得
             String eventName = req.getParameter("eventName");
             String holdingDate = req.getParameter("holdingDate");
             String holdingTime = req.getParameter("holdingTime");
@@ -71,102 +60,62 @@ public class HostEventCreateExecuteAction extends Action {
             String link = req.getParameter("link");
             String eventOverview = req.getParameter("eventOverview");
             String categoryId = req.getParameter("categoryId");
-            String mapInHall = req.getParameter("mapInHall");
-            String mapOutOfHall = req.getParameter("mapOutOfHall");
-            String ticketInfo = req.getParameter("ticketInfo");
 
-            System.out.println("  受信パラメータ:");
-            System.out.println("    - eventName: [" + eventName + "]");
-            System.out.println("    - holdingDate: [" + holdingDate + "]");
-            System.out.println("    - holdingTime: [" + holdingTime + "]");
-            System.out.println("    - address: [" + address + "]");
-            System.out.println("    - maxCount: [" + maxCountStr + "]");
-            System.out.println("    - eventHoldState: [" + eventHoldState + "]");
-            System.out.println("    - phoneNumber: [" + phoneNumber + "]");
-            System.out.println("    - link: [" + link + "]");
-            System.out.println("    - eventOverview: [" + (eventOverview != null ? eventOverview.substring(0, Math.min(50, eventOverview.length())) + "..." : "null") + "]");
-            System.out.println("    - categoryId: [" + categoryId + "]");
-            System.out.println("    - mapInHall: [" + mapInHall + "]");
-            System.out.println("    - mapOutOfHall: [" + mapOutOfHall + "]");
-            System.out.println("    - ticketInfo: [" + ticketInfo + "]");
+            System.out.println("\n受信パラメータ:");
+            System.out.println("  - eventName: " + eventName);
+            System.out.println("  - holdingDate: " + holdingDate);
+            System.out.println("  - address: " + address);
 
-            System.out.println("\n【STEP 4】バリデーション");
+            // バリデーション
+            if (eventName == null || eventName.trim().isEmpty() ||
+                holdingDate == null || holdingDate.trim().isEmpty() ||
+                holdingTime == null || holdingTime.trim().isEmpty() ||
+                address == null || address.trim().isEmpty() ||
+                maxCountStr == null || maxCountStr.trim().isEmpty() ||
+                eventOverview == null || eventOverview.trim().isEmpty()) {
 
-            if (eventName == null || eventName.trim().isEmpty()) {
-                System.out.println("  ✗ イベント名が空");
-                req.setAttribute("errorMessage", "イベント名を入力してください。");
+                System.out.println("✗ 必須項目が入力されていません");
+                req.setAttribute("errorMessage", "必須項目が入力されていません。");
                 req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
                 return;
             }
-            System.out.println("  ✓ イベント名OK");
 
-            if (holdingDate == null || holdingDate.trim().isEmpty()) {
-                System.out.println("  ✗ 開催日が空");
-                req.setAttribute("errorMessage", "開催日を入力してください。");
-                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
-                return;
-            }
-            System.out.println("  ✓ 開催日OK");
+            System.out.println("✓ バリデーションOK");
 
-            if (holdingTime == null || holdingTime.trim().isEmpty()) {
-                System.out.println("  ✗ 開催時刻が空");
-                req.setAttribute("errorMessage", "開催時刻を入力してください。");
-                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
-                return;
-            }
-            System.out.println("  ✓ 開催時刻OK");
-
-            if (address == null || address.trim().isEmpty()) {
-                System.out.println("  ✗ 住所が空");
-                req.setAttribute("errorMessage", "開催場所を入力してください。");
-                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
-                return;
-            }
-            System.out.println("  ✓ 開催場所OK");
-
-            if (maxCountStr == null || maxCountStr.trim().isEmpty()) {
-                System.out.println("  ✗ 定員が空");
-                req.setAttribute("errorMessage", "定員を入力してください。");
-                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
-                return;
-            }
-            System.out.println("  ✓ 定員入力OK");
-
-            if (eventOverview == null || eventOverview.trim().isEmpty()) {
-                System.out.println("  ✗ イベント概要が空");
-                req.setAttribute("errorMessage", "イベント概要を入力してください。");
-                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
-                return;
-            }
-            System.out.println("  ✓ イベント概要OK");
-
-            System.out.println("  ✓ 全項目バリデーションOK");
-
-            System.out.println("\n【STEP 5】定員の数値変換");
-            int maxCount = 0;
-            try {
-                maxCount = Integer.parseInt(maxCountStr);
-                System.out.println("  ✓ 定員変換成功: " + maxCount);
-            } catch (NumberFormatException e) {
-                System.out.println("  ✗ 定員変換エラー: " + e.getMessage());
-                req.setAttribute("errorMessage", "定員には数値を入力してください。");
-                req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
-                return;
-            }
+            int maxCount = Integer.parseInt(maxCountStr);
 
             if (maxCount < 1 || maxCount > 10000) {
-                System.out.println("  ✗ 定員範囲エラー: " + maxCount);
                 req.setAttribute("errorMessage", "定員は1〜10000人の範囲で入力してください。");
                 req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
                 return;
             }
-            System.out.println("  ✓ 定員範囲チェックOK");
 
-            System.out.println("\n【STEP 6】イベントID自動生成");
+            // イベントID自動生成
             String eventId = generateEventId();
-            System.out.println("  ✓ イベントID生成成功: " + eventId);
+            System.out.println("✓ イベントID生成: " + eventId);
 
-            System.out.println("\n【STEP 7】Eventオブジェクト作成");
+            // 画像アップロード処理
+            String mapInHallPath = null;
+            String mapOutOfHallPath = null;
+
+            try {
+                Part mapInHallPart = req.getPart("mapInHall");
+                if (mapInHallPart != null && mapInHallPart.getSize() > 0) {
+                    mapInHallPath = saveUploadedFile(mapInHallPart, req, eventId + "_in");
+                    System.out.println("✓ 会場内マップ保存: " + mapInHallPath);
+                }
+
+                Part mapOutOfHallPart = req.getPart("mapOutOfHall");
+                if (mapOutOfHallPart != null && mapOutOfHallPart.getSize() > 0) {
+                    mapOutOfHallPath = saveUploadedFile(mapOutOfHallPart, req, eventId + "_out");
+                    System.out.println("✓ 会場外マップ保存: " + mapOutOfHallPath);
+                }
+            } catch (Exception e) {
+                System.err.println("✗ 画像アップロードエラー: " + e.getMessage());
+                // 画像アップロードエラーでもイベント作成は続行
+            }
+
+            // Eventオブジェクト作成
             Event event = new Event();
             event.setEventId(eventId);
             event.setEventName(eventName.trim());
@@ -180,78 +129,108 @@ public class HostEventCreateExecuteAction extends Action {
             event.setEventOverview(eventOverview.trim());
             event.setHostId(user.getUser_id());
             event.setCategoryId(categoryId != null && !categoryId.trim().isEmpty() ? categoryId.trim() : null);
-            event.setMapInHall(mapInHall != null && !mapInHall.trim().isEmpty() ? mapInHall.trim() : null);
-            event.setMapOutOfHall(mapOutOfHall != null && !mapOutOfHall.trim().isEmpty() ? mapOutOfHall.trim() : null);
-            event.setTicketInfo(ticketInfo != null && !ticketInfo.trim().isEmpty() ? ticketInfo.trim() : null);
+            event.setMapInHall(mapInHallPath);
+            event.setMapOutOfHall(mapOutOfHallPath);
             event.setUserId(user.getUser_id());
             event.setTotalPayment(0);
 
-            System.out.println("  ✓ Eventオブジェクト作成完了");
-            System.out.println("    - EventID: " + event.getEventId());
-            System.out.println("    - EventName: " + event.getEventName());
-            System.out.println("    - HoldingDate: " + event.getHoldingDate());
-            System.out.println("    - HoldingTime: " + event.getHoldingTime());
-            System.out.println("    - Address: " + event.getAddress());
-            System.out.println("    - MaxCount: " + event.getMaxCount());
-            System.out.println("    - EventHoldState: " + event.getEventHoldState());
-            System.out.println("    - HostId: " + event.getHostId());
-            System.out.println("    - EventOverview: " + event.getEventOverview().substring(0, Math.min(50, event.getEventOverview().length())) + "...");
+            System.out.println("\n✓ Eventオブジェクト作成完了");
 
-            System.out.println("\n【STEP 8】データベース登録");
+            // データベース登録
             EventDao eventDao = new EventDao();
-            System.out.println("  ✓ EventDao作成完了");
-
-            System.out.println("  → save()メソッド呼び出し中...");
             int count = eventDao.save(event);
-            System.out.println("  ← save()メソッド完了");
 
-            System.out.println("  登録結果: " + count + "件");
+            System.out.println("登録結果: " + count + "件");
 
             if (count > 0) {
-                System.out.println("\n████████████████████████████████████████████████████████████████");
-                System.out.println("███                                                          ███");
-                System.out.println("███          ✓✓✓ イベント作成成功！ ✓✓✓                  ███");
-                System.out.println("███                                                          ███");
-                System.out.println("████████████████████████████████████████████████████████████████");
-                System.out.println();
+                System.out.println("✓✓✓ イベント作成成功！ ✓✓✓");
+                System.out.println("████████████████████████████████████████████████████████████████\n");
 
                 session.setAttribute("successMessage", "イベント「" + event.getEventName() + "」を作成しました。");
                 res.sendRedirect(req.getContextPath() + "/eventportal/host/HostMenu.action");
             } else {
-                System.out.println("\n████████████████████████████████████████████████████████████████");
-                System.out.println("███                                                          ███");
-                System.out.println("███          ✗✗✗ イベント作成失敗（登録0件） ✗✗✗        ███");
-                System.out.println("███                                                          ███");
-                System.out.println("████████████████████████████████████████████████████████████████");
-                System.out.println();
-
+                System.out.println("✗ イベント作成失敗");
                 req.setAttribute("errorMessage", "イベントの作成に失敗しました。");
                 req.setAttribute("event", event);
                 req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
             }
 
         } catch (NumberFormatException e) {
-            System.err.println("\n✗✗✗ 数値変換エラー ✗✗✗");
-            System.err.println("エラー内容: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("✗ 数値変換エラー: " + e.getMessage());
             req.setAttribute("errorMessage", "定員には数値を入力してください。");
             req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
         } catch (Exception e) {
-            System.err.println("\n████████████████████████████████████████████████████████████████");
-            System.err.println("███                                                          ███");
-            System.err.println("███          ✗✗✗ イベント作成エラー ✗✗✗                  ███");
-            System.err.println("███                                                          ███");
-            System.err.println("████████████████████████████████████████████████████████████████");
-            System.err.println();
-            System.err.println("エラークラス: " + e.getClass().getName());
-            System.err.println("エラーメッセージ: " + e.getMessage());
-            System.err.println("スタックトレース:");
+            System.err.println("✗✗✗ イベント作成エラー ✗✗✗");
+            System.err.println("エラー内容: " + e.getMessage());
             e.printStackTrace();
-            System.err.println();
-
             req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
             req.getRequestDispatcher("/eventportal/host/host_event_create.jsp").forward(req, res);
         }
+    }
+
+    /**
+     * アップロードされた画像ファイルを保存
+     * @param part アップロードファイル
+     * @param req HttpServletRequest
+     * @param prefix ファイル名プレフィックス
+     * @return 保存されたファイルのパス（相対パス）
+     * @throws Exception
+     */
+    private String saveUploadedFile(Part part, HttpServletRequest req, String prefix) throws Exception {
+        // ファイルサイズチェック
+        if (part.getSize() > MAX_FILE_SIZE) {
+            throw new Exception("ファイルサイズが大きすぎます（最大5MB）");
+        }
+
+        // ファイル名取得
+        String fileName = getFileName(part);
+        if (fileName == null || fileName.isEmpty()) {
+            return null;
+        }
+
+        // 拡張子取得
+        String extension = "";
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            extension = fileName.substring(dotIndex);
+        }
+
+        // ユニークなファイル名生成
+        String uniqueFileName = prefix + "_" + UUID.randomUUID().toString() + extension;
+
+        // 保存先ディレクトリ作成
+        String uploadPath = req.getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+            System.out.println("  ディレクトリ作成: " + uploadPath);
+        }
+
+        // ファイル保存
+        String filePath = uploadPath + File.separator + uniqueFileName;
+        try (InputStream input = part.getInputStream()) {
+            Files.copy(input, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // 相対パスを返す（DBに保存）
+        return UPLOAD_DIR + "/" + uniqueFileName;
+    }
+
+    /**
+     * Partからファイル名を取得
+     * @param part Part
+     * @return ファイル名
+     */
+    private String getFileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        if (contentDisposition != null) {
+            for (String token : contentDisposition.split(";")) {
+                if (token.trim().startsWith("filename")) {
+                    return token.substring(token.indexOf('=') + 1).trim().replace("\"", "");
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -260,19 +239,13 @@ public class HostEventCreateExecuteAction extends Action {
      * @throws Exception
      */
     private String generateEventId() throws Exception {
-        System.out.println("  → イベントID生成処理開始");
-
         Dao dao = new Dao();
         Connection connection = dao.getConnection();
-        System.out.println("    ✓ DB接続成功");
-
         PreparedStatement statement = null;
         ResultSet resultSet = null;
 
         try {
             String sql = "SELECT event_id FROM EVENTS ORDER BY event_id DESC LIMIT 1";
-            System.out.println("    SQL: " + sql);
-
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
 
@@ -280,35 +253,16 @@ public class HostEventCreateExecuteAction extends Action {
 
             if (resultSet.next()) {
                 String lastEventId = resultSet.getString("event_id");
-                System.out.println("    最新イベントID: " + lastEventId);
-
                 String numberPart = lastEventId.substring(3);
                 nextNumber = Integer.parseInt(numberPart) + 1;
-
-                System.out.println("    数値部分: " + numberPart);
-                System.out.println("    次の番号: " + nextNumber);
-            } else {
-                System.out.println("    既存イベントなし、初回作成");
             }
 
-            String newEventId = String.format("EVT%03d", nextNumber);
-            System.out.println("    生成ID: " + newEventId);
-
-            return newEventId;
+            return String.format("EVT%03d", nextNumber);
 
         } finally {
-            if (resultSet != null) {
-                resultSet.close();
-                System.out.println("    ✓ ResultSetクローズ");
-            }
-            if (statement != null) {
-                statement.close();
-                System.out.println("    ✓ Statementクローズ");
-            }
-            if (connection != null) {
-                connection.close();
-                System.out.println("    ✓ Connectionクローズ");
-            }
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
     }
 }
