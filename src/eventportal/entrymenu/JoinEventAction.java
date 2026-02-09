@@ -17,14 +17,16 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import bean.Event;
 import bean.Ticket;
 import bean.User;
 import dao.Dao;
+import dao.EventDao;
 import dao.TicketDao;
 import tool.Action;
 
 /**
- * イベント参加登録アクション
+ * イベント参加登録アクション（完全版）
  */
 public class JoinEventAction extends Action {
     @Override
@@ -42,6 +44,7 @@ public class JoinEventAction extends Action {
 
         String eventId = req.getParameter("eventId");
         if (eventId == null || eventId.isEmpty()) {
+            System.out.println("エラー：イベントIDが指定されていません");
             req.setAttribute("errorMessage", "イベントIDが指定されていません。");
             req.getRequestDispatcher("/error.jsp").forward(req, res);
             return;
@@ -51,25 +54,50 @@ public class JoinEventAction extends Action {
         System.out.println("ユーザーID: " + user.getUser_id());
 
         try {
-            TicketDao ticketDao = new TicketDao();
+            // イベント存在確認
+            EventDao eventDao = new EventDao();
+            Event event = eventDao.get(eventId);
 
-            Ticket existingTicket = ticketDao.getByEventAndUser(eventId, user.getUser_id());
-            if (existingTicket != null) {
-                System.out.println("既に参加済みです");
-                res.sendRedirect(req.getContextPath() + "/eventportal/entrymenu/EntryEventDetail.action?eventId=" + eventId);
+            if (event == null) {
+                System.out.println("エラー：イベントが見つかりません");
+                session.setAttribute("errorMessage", "指定されたイベントが見つかりません。");
+                res.sendRedirect(req.getContextPath() + "/eventportal/entrymenu/EntryEventManage.action");
                 return;
             }
 
+            System.out.println("イベント名: " + event.getEventName());
+            System.out.println("host_id: " + event.getHostId());
+
+            // host_idチェック
+            if (event.getHostId() == null || event.getHostId().isEmpty()) {
+                System.out.println("警告：host_idが設定されていません。デフォルト値を使用します。");
+                event.setHostId("s");
+            }
+
+            TicketDao ticketDao = new TicketDao();
+
+            // 重複参加チェック
+            Ticket existingTicket = ticketDao.getByEventAndUser(eventId, user.getUser_id());
+            if (existingTicket != null) {
+                System.out.println("既に参加済みです");
+                session.setAttribute("errorMessage", "このイベントには既に参加登録済みです。");
+                res.sendRedirect(req.getContextPath() + "/eventportal/entrymenu/EntryEventManage.action");
+                return;
+            }
+
+            // チケットID自動生成
             String ticketId = generateTicketId();
             System.out.println("生成されたチケットID: " + ticketId);
 
+            // チケットオブジェクト作成
             Ticket ticket = new Ticket();
             ticket.setTicketId(ticketId);
             ticket.setEventId(eventId);
             ticket.setUserId(user.getUser_id());
             ticket.setParticipantName(user.getUser_name() + "様");
-            ticket.setStatus(1);
+            ticket.setStatus(1); // 1:有効
 
+            // QRコード生成
             System.out.println("QRコード生成開始...");
             try {
                 QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -86,28 +114,36 @@ public class JoinEventAction extends Action {
 
             } catch (Exception qrError) {
                 System.err.println("QRコード生成エラー: " + qrError.getMessage());
+                qrError.printStackTrace();
+                // QRコード生成失敗してもチケット作成は続行
             }
 
+            // チケット登録
             int count = ticketDao.insert(ticket);
 
             if (count > 0) {
-                System.out.println("チケット登録成功！");
+                System.out.println("✓ チケット登録成功！");
                 session.setAttribute("successMessage", "イベントへの参加登録が完了しました！");
                 res.sendRedirect(req.getContextPath() + "/eventportal/entrymenu/EntryEventManage.action?joined=true");
             } else {
-                System.out.println("チケット登録失敗");
-                req.setAttribute("errorMessage", "参加登録に失敗しました。");
-                req.getRequestDispatcher("/error.jsp").forward(req, res);
+                System.out.println("✗ チケット登録失敗");
+                session.setAttribute("errorMessage", "参加登録に失敗しました。もう一度お試しください。");
+                res.sendRedirect(req.getContextPath() + "/eventportal/entrymenu/EntryEventManage.action");
             }
 
         } catch (Exception e) {
             System.err.println("イベント参加登録エラー: " + e.getMessage());
             e.printStackTrace();
-            req.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
-            req.getRequestDispatcher("/error.jsp").forward(req, res);
+            session.setAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
+            res.sendRedirect(req.getContextPath() + "/eventportal/entrymenu/EntryEventManage.action");
         }
     }
 
+    /**
+     * チケットID自動生成
+     * @return 新しいチケットID
+     * @throws Exception
+     */
     private String generateTicketId() throws Exception {
         Dao dao = new Dao();
         Connection connection = dao.getConnection();
@@ -123,6 +159,7 @@ public class JoinEventAction extends Action {
 
             if (resultSet.next()) {
                 String lastTicketId = resultSet.getString("ticket_id");
+                // TKT00001 → 00001 → 1 → 2 → 00002 → TKT00002
                 String numberPart = lastTicketId.substring(3);
                 nextNumber = Integer.parseInt(numberPart) + 1;
             }
