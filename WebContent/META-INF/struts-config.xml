@@ -177,6 +177,13 @@
             <forward name="success" path="/eventportal/entry/order/order_complete.jsp"/>
             <forward name="error" path="/eventportal/entry/order/EntryProductList.action"/>
         </action>
+        <action path="/eventportal/entrymenu/EntryMenuView"
+        type="eventportal.entrymenu.EntryMenuViewAction">
+        </action>
+        <!-- メニュー注文 -->
+<action path="/eventportal/entrymenu/MenuOrder"
+        type="eventportal.entrymenu.MenuOrderAction">
+</action>
 
         <!-- ==================== 主催者機能 ==================== -->
         <!-- 主催者メニュー -->
@@ -324,6 +331,23 @@
                 type="eventportal.host.order.UpdateOrderStatusAction">
             <forward name="success" path="/eventportal/host/order/OrderList.action"/>
         </action>
+
+        <!-- メニュー管理 -->
+<action path="/eventportal/host/MenuList"
+        type="eventportal.host.MenuListAction">
+</action>
+
+<action path="/eventportal/host/MenuCreate"
+        type="eventportal.host.MenuCreateAction">
+</action>
+
+<action path="/eventportal/host/MenuCreateExecute"
+        type="eventportal.host.MenuCreateExecuteAction">
+</action>
+
+<action path="/eventportal/host/MenuDelete"
+        type="eventportal.host.MenuDeleteAction">
+</action>
 
     </action-mappings>
 </struts-config>

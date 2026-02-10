@@ -278,12 +278,11 @@
                 🏢 会場内マップ表示
             </a>
 
-            <!-- グッズ・フード管理 -->
-            <a href="${pageContext.request.contextPath}/eventportal/entry/order/EntryProductList.action?eventId=${evt.eventId}"
-               class="btn btn-goods">
-                🛍️ グッズ・フード管理
-            </a>
-
+<!-- グッズ・フード管理 -->
+<a href="${pageContext.request.contextPath}/eventportal/entrymenu/EntryMenuView.action?eventId=${evt.eventId}"
+   class="btn btn-goods">
+    🛍️ グッズ・フード管理
+</a>
             <!-- ★★★ QRコード表示（重要：必ずActionを経由）★★★ -->
             <a href="${pageContext.request.contextPath}/eventportal/entrymenu/ShowQRCode.action?eventId=${evt.eventId}"
                class="btn btn-qr">

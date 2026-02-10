@@ -1,33 +1,45 @@
 package bean;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
- * 注文情報を保持するBeanクラス
+ * 注文情報を保持するBean
  */
 public class Order implements Serializable {
-    private String orderId;              // 注文ID
-    private String userId;               // ユーザーID
-    private String eventId;              // イベントID
-    private String ticketId;             // チケットID
-    private LocalDateTime orderDate;     // 注文日時
-    private int totalAmount;             // 合計金額
-    private int status;                  // ステータス（1:注文済み, 2:準備中, 3:完了, 9:キャンセル）
-    private List<OrderItem> items;       // 注文明細リスト
+    private static final long serialVersionUID = 1L;
 
-    // コンストラクタ
+    private String orderId;         // 注文ID
+    private String menuId;          // メニューID
+    private String userId;          // ユーザーID
+    private String eventId;         // イベントID
+    private int quantity;           // 数量
+    private int totalPrice;         // 合計金額
+    private String orderDate;       // 注文日時
+    private String status;          // ステータス
+
+    // メニュー名（JOIN用）
+    private String menuName;
+    private String menuType;
+
+    // デフォルトコンストラクタ
     public Order() {
     }
 
-    // Getter & Setter
+    // Getter/Setter
     public String getOrderId() {
         return orderId;
     }
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public String getMenuId() {
+        return menuId;
+    }
+
+    public void setMenuId(String menuId) {
+        this.menuId = menuId;
     }
 
     public String getUserId() {
@@ -46,63 +58,51 @@ public class Order implements Serializable {
         this.eventId = eventId;
     }
 
-    public String getTicketId() {
-        return ticketId;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setTicketId(String ticketId) {
-        this.ticketId = ticketId;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
-    public LocalDateTime getOrderDate() {
+    public int getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(LocalDateTime orderDate) {
+    public void setOrderDate(String orderDate) {
         this.orderDate = orderDate;
     }
 
-    public int getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(int totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public List<OrderItem> getItems() {
-        return items;
+    public String getMenuName() {
+        return menuName;
     }
 
-    public void setItems(List<OrderItem> items) {
-        this.items = items;
+    public void setMenuName(String menuName) {
+        this.menuName = menuName;
     }
 
-    // ユーティリティメソッド
-    public String getStatusText() {
-        switch (status) {
-            case 1:
-                return "注文済み";
-            case 2:
-                return "準備中";
-            case 3:
-                return "完了";
-            case 9:
-                return "キャンセル";
-            default:
-                return "不明";
-        }
+    public String getMenuType() {
+        return menuType;
     }
 
-    public boolean isActive() {
-        return status != 9;
+    public void setMenuType(String menuType) {
+        this.menuType = menuType;
     }
 }

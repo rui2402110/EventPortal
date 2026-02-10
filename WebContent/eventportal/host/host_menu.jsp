@@ -68,8 +68,6 @@
             font-size: 14px;
             transition: all 0.3s;
             display: inline-block;
-            border: none;
-            cursor: pointer;
         }
 
         .btn-logout:hover {
@@ -233,13 +231,13 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-detail {
-            background: #3498db;
+        .btn-menu {
+            background: #9b59b6;
             color: white;
         }
 
-        .btn-detail:hover {
-            background: #2980b9;
+        .btn-menu:hover {
+            background: #8e44ad;
         }
 
         .btn-edit {
@@ -317,11 +315,11 @@
 <body>
     <div class="container">
         <div class="header-bar">
-            <h1> イベントポータル - 主催者</h1>
+            <h1>イベントポータル - 主催者</h1>
             <div class="header-buttons">
                 <a href="${pageContext.request.contextPath}/eventportal/host/HostEventCreate.action"
                    class="btn-new-event">
-                    新規イベント作成
+                     新規イベント作成
                 </a>
                 <a href="${pageContext.request.contextPath}/eventportal/auth/Logout.action"
                    class="btn-logout"
@@ -388,11 +386,11 @@
                                     QRスキャン画面
                                 </a>
 
-                                <!-- 詳細と編集 -->
+                                <!-- メニュー登録と編集 -->
                                 <div class="action-row">
-                                    <a href="${pageContext.request.contextPath}/eventportal/host/TicketList.action?eventId=${evt.eventId}"
-                                       class="btn btn-detail">
-                                         詳細
+                                    <a href="${pageContext.request.contextPath}/eventportal/host/MenuList.action?eventId=${evt.eventId}"
+                                       class="btn btn-menu">
+                                        メニュー登録
                                     </a>
                                     <a href="${pageContext.request.contextPath}/eventportal/host/HostEventUpdate.action?eventId=${evt.eventId}"
                                        class="btn btn-edit">
